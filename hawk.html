@@ -1,0 +1,396 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Mario like Inchallah j'y arrive</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+
+var config = {
+    type: Phaser.AUTO,
+    width: 896,
+    height: 448,
+    physics: {
+        default: 'arcade',
+        arcade:{
+            gravity: {y: 300},
+            debug:true,
+        }
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
+
+var player;
+var cursors;
+var caisses
+var caisse;
+var box;
+var wallsLayer;
+var gameOver = false;
+var death;
+var ground;
+var Touche_Caisse=false;
+var playerDirection="right";
+//FEU
+var Buta_Feu;
+var piment;
+var piments;
+var lancer_boule_de_feu;
+var boules_de_feu;
+var destroyFireball;
+//GLACE
+var Buta_Glace;
+var glace;
+var glaces;
+var lancer_boule_de_glace;
+var boules_de_glace;
+//PAS TOUCHÉ//
+var Buta_Aile;
+var poulet;
+var poulets;
+var flying_mode;
+var aliment;
+var jauge;
+//////////////
+//CONTROLES
+var Haut;
+var Bas;
+var Gauche;
+var Droite;
+var Roulade;
+var roulade = false;
+
+
+var game = new Phaser.Game(config);
+
+
+function preload ()
+{
+    this.load.image('tiles','assets/tiles/teste.png');
+    this.load.image('box','assets/tiles/box.png');
+    this.load.image('chilli_pepper','assets/tiles/box.png');
+    this.load.image('ice_cream','assets/tiles/box.png');
+    this.load.image('boule_de_feu','assets/tiles/box.png');
+    this.load.image('boule_de_glace','assets/tiles/box.png');
+    this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
+}
+
+function create ()
+{  
+    const map = this.make.tilemap({key : 'map'});
+    const tileset = map.addTilesetImage('teste','tiles');
+
+    ground = map.createDynamicLayer('Ville',tileset);
+    ground.setCollisionByExclusion(-1,true);
+    
+    player = this.physics.add.sprite(200,1550, 'dude').setScale(1.1);
+    
+    this.cameras.main.startFollow(player);
+    
+    player.setBounce(0.0);
+    player.setCollideWorldBounds(false);
+
+    cursors = this.input.keyboard.createCursorKeys();    
+    Jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);  
+    Competence_Speciale = this.input.keyboard.addKey('F');
+    Roulade = this.input.keyboard.addKey('E');
+
+    this.physics.add.collider(player, ground);
+
+//CAISSE
+    const CaisseObjects = map.getObjectLayer('Caisse').objects;
+
+    this.caisses = this.physics.add.group({
+        immovable:true,
+        allowGravity:false,
+    });
+
+    for (const caisse of CaisseObjects){
+            this.caisses.create(caisse.x, caisse.y, 'box')
+                .setScale(0.1)
+        }
+
+    for (const caisse of this.caisses.children.entries) {
+        this.physics.add.collider(caisse, ground);
+        this.physics.add.collider(player, caisse, hitByPlayer, null, this);
+        
+    }       
+        this.physics.add.collider(this.caisses, this.caisses);
+
+//PIMENT
+    const PimentObjects = map.getObjectLayer('Piment').objects;
+
+    this.piments = this.physics.add.group({
+        immovable:true,
+        allowGravity:false,
+    });
+    
+    for (const piment of PimentObjects){
+            this.piments.create(piment.x, piment.y, 'chilli_pepper')
+                .setScale(0.1)
+        }
+
+    for (const piment of this.piments.children.entries) {
+        this.physics.add.collider(piment, ground);
+        this.physics.add.overlap(player, piment, Recolte_Piment, null, this);
+        
+    }       
+    
+//GLACE
+    const GlaceObjects = map.getObjectLayer('Glace').objects;
+
+    this.glaces = this.physics.add.group({
+        immovable:true,
+        allowGravity:false,
+    });
+
+    for(const glace of GlaceObjects){
+            this.glaces.create(glace.x, glace.y, 'ice_cream')
+                .setScale(0.1)
+    }
+
+    for (const glace of this.glaces.children.entries){
+        this.physics.add.collider(glace, ground);
+        this.physics.add.overlap(player, glace, Recolte_Glace, null, this);
+    }
+//ALIMENTS
+
+    
+//BOULE DE FEU
+    boules_de_feu = this.physics.add.group({
+        allowGravity:true,
+    });
+    this.physics.add.collider(boules_de_feu, ground);
+    this.physics.add.collider(boules_de_feu, ground, destroyFireball, null, this);
+
+//BOULE DE GLACE 
+    boules_de_glace = this.physics.add.group({
+        allowGravity:true,
+    });
+    this.physics.add.collider(boules_de_glace, ground);
+}
+
+//CONTROLE 
+function update ()
+{
+    
+    player.update();
+    onGround = player.body.blocked.down;
+    roulade=false;
+    if (gameOver)
+    {
+        return;
+    }
+
+    if (cursors.left.isUp && cursors.right.isUp && cursors.up.isUp && cursors.down.isUp)
+    {
+        player.setVelocityX(0);
+    }
+
+    if (cursors.left.isDown && Roulade.isDown)
+    {
+        roulade=true;
+        player.setVelocityX(-500);
+        
+    }
+    if(cursors.right.isDown && Roulade.isDown)
+    {
+        roulade=true;
+        player.setVelocityX(500);
+    }
+
+    if (cursors.left.isDown && Roulade.isUp)
+    {
+        player.setVelocityX(-160);
+        
+    }
+    if(cursors.right.isDown && Roulade.isUp)
+    {
+        player.setVelocityX(160);
+    }
+      
+    if (cursors.up.isDown && onGround==true || Jump.isDown && onGround==true)
+    {
+        player.setVelocityY(-160);
+    }
+    if (cursors.up.isDown && Touche_Caisse==true || Jump.isDown && Touche_Caisse==true)
+    {
+        Touche_Caisse=false;
+        player.setVelocityY(-160);
+    }
+
+    if(cursors.down.isDown)
+    {
+        player.setVelocityY(160);    
+    }
+
+    if (Competence_Speciale.isDown)
+    {
+        if(Buta_Feu==true /*&& Dispo_BDF==true*/)
+        {
+            lancer_boule_de_feu(player);
+        }       
+    }
+
+    if (Competence_Speciale.isDown)
+    {
+        if(Buta_Glace==true /*&& Dispo_BDG==true*/)
+        {
+            lancer_boule_de_glace(player);
+        }       
+    }
+   /*  if (Competence_Speciale.isDown)
+    {
+        if(Buta_Aile==true /*&& Dispo_Aile==true)
+        {
+            flying_mode(player);
+        }       
+    } */
+
+}
+
+///////////////////////////////////////
+///////FONCTIONS SPECIALS SKILLS///////
+///////////////////////////////////////
+
+//Need latence entre chaque BDF ++ Block direction when touch.isUp
+function lancer_boule_de_feu(player){ 
+        var boule_de_feu = boules_de_feu.create(player.x, player.y-15,'boule_de_feu')
+        .setBounce(1)
+        .setGravityY(2000)
+        .setScale(0.1)
+
+        var directionFireballPlayer = Math.round(Phaser.Math.Between(0,1))
+        
+        if(cursors.left.isDown){
+            directionFireballPlayer=-400;
+            playerDirection="left";
+        }
+        else if(cursors.right.isDown){
+            directionFireballPlayer=400;
+            playerDirection="right";
+        }
+        else if(cursors.right.isUp && cursors.left.isUp && cursors.up.isUp && directionFireballPlayer==1){
+            directionFireballPlayer=400;
+        }
+        else if(cursors.right.isUp && cursors.left.isUp && cursors.up.isUp && directionFireballPlayer==0){
+            directionFireballPlayer=-400;
+        }
+
+        if(playerDirection=="right"){
+            /* player.play('throwFireball', true).setFlipX(false); */
+            boule_de_feu.setVelocity(400, 200);
+        }
+
+        else if(playerDirection=="left"){
+            /* player.play('throwFireball', true).setFlipX(true); */
+            boule_de_feu.setVelocity(-400, 200);
+        }
+
+//NEED UPDATE DESTRUCTION BDF
+function destroyFireball(boule_de_feu, ground){
+            boule_de_feu.destroy();
+        }
+    }
+
+//Add latence entre chaque BDG
+function lancer_boule_de_glace(player){
+        var boule_de_glace = boules_de_glace.create(player.x, player.y-15, 'boule_de_glace')
+        .setBounce(1)
+        .setGravityY(2000)
+        .setScale(0.1)
+
+        var directionIceBallPlayer = Math.round(Phaser.Math.Between(0,1))
+        
+        if(cursors.left.isDown){
+            directionIceBallPlayer=-400;
+            playerDirection="left";
+        }
+        else if(cursors.right.isDown){
+            directionIceBallPlayer=400;
+            playerDirection="right";
+        }
+        else if(cursors.right.isUp && cursors.left.isUp && cursors.up.isUp && directionIceBallPlayer==1){
+            directionIceBallPlayer=400;
+        }
+        else if(cursors.right.isUp && cursors.left.isUp && cursors.up.isUp && directionIceBallPlayer==0){
+            directionIceBallPlayer=-400;
+        }
+
+        if(playerDirection=="right"){
+            /* player.play('throwFireball', true).setFlipX(false); */
+            boule_de_glace.setVelocity(400, 200);
+        }
+
+        else if(playerDirection=="left"){
+            /* player.play('throwFireball', true).setFlipX(true); */
+            boule_de_glace.setVelocity(-400, 200);
+        }
+    }
+//SETPLAYER TEMPORARY STATS
+/* function flying_mode(player){
+        .setGravity(0)
+        .setVelocityX(500)
+} */
+
+///////////////////////////////////////
+/////FIN FONCTIONS SPECIALS SKILLS/////
+///////////////////////////////////////
+
+function hitByPlayer(player, caisse)
+{
+    Touche_Caisse=true;
+    if(roulade==true){
+        caisse.destroy();
+    }
+}
+
+///////////////////////////////////////
+//////FONCTIONS RECOLTES ELEMENTS//////
+///////////////////////////////////////
+
+function Recolte_Piment(player, piment)
+{
+    piment.destroy();
+    Buta_Feu=true;
+    Buta_Glace=false;
+    Buta_Aile=false;
+}
+
+function Recolte_Glace(player, glace)
+{
+    glace.destroy();
+    Buta_Glace=true;
+    Buta_Feu=false;
+    Buta_Aile=false;
+}
+
+/* function Recolte_Poulet(player,poulet)
+{
+    poulet.destroy();
+    Buta_Aile=true;
+} */
+///////////////////////////////////////
+////FIN FONCTIONS RECOLTES ELEMENTS////
+///////////////////////////////////////
+
+/* function jauge(player){
+    //ADD JAUGE
+    //ADD 10/100 PER ALIMENTS
+    //IF 100 GIVE STATUE ROULADE → ROULADE UNLOCK
+} */
+</script>
+
+</body>
+</html>
