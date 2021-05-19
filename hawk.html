@@ -42,6 +42,7 @@ var death;
 var ground;
 var Touche_Caisse=false;
 var playerDirection="right";
+var destroyBox;
 //FEU
 var Buta_Feu;
 var piment;
@@ -49,20 +50,20 @@ var piments;
 var lancer_boule_de_feu;
 var boules_de_feu;
 var destroyFireball;
-var cooldownFireball = 120;
-var delaiFireballPlayer = 120;
-var fireballPlayer = true
+var BDF_reload = true;
 //GLACE
 var Buta_Glace;
 var glace;
 var glaces;
 var lancer_boule_de_glace;
 var boules_de_glace;
+var BDG_reload = true;
 //PAS TOUCHÉ//
 var Buta_Aile;
 var poulet;
 var poulets;
 var flying_mode;
+var Aile_reload = true;
 var aliment;
 var jauge;
 //////////////
@@ -86,6 +87,7 @@ function preload ()
     this.load.image('ice_cream','assets/tiles/box.png');
     this.load.image('boule_de_feu','assets/tiles/box.png');
     this.load.image('boule_de_glace','assets/tiles/box.png');
+    this.load.image('poulet','assets/tiles/box.png');
     this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
 }
 
@@ -126,8 +128,7 @@ function create ()
 
     for (const caisse of this.caisses.children.entries) {
         this.physics.add.collider(caisse, ground);
-        this.physics.add.collider(player, caisse, hitByPlayer, null, this);
-        
+        this.physics.add.collider(player, caisse, hitByPlayer, null, this);        
     }       
         this.physics.add.collider(this.caisses, this.caisses);
 
@@ -167,8 +168,24 @@ function create ()
         this.physics.add.collider(glace, ground);
         this.physics.add.overlap(player, glace, Recolte_Glace, null, this);
     }
-//ALIMENTS
 
+//APOULET
+    const PouletObjects = map.getObjectLayer('Poulet').objects;
+
+    this.poulets = this.physics.add.group({
+        immovable:true,
+        allowGravity:false,
+    });
+
+    for(const poulet of PouletObjects){
+            this.poulets.create(poulet.x, poulet.y, 'chicken')
+                .setScale(0.1)
+    }
+
+    for (const poulet of this.poulets.children.entries){
+        this.physics.add.collider(poulet, ground);
+        this.physics.add.overlap(player, poulet, Recolte_Poulet, null, this);
+    }
     
 //BOULE DE FEU
     boules_de_feu = this.physics.add.group({
@@ -181,7 +198,6 @@ function create ()
     boules_de_glace = this.physics.add.group({
         allowGravity:true,
     });
-    this.physics.add.collider(boules_de_glace, ground);
 }
 
 //CONTROLE 
@@ -241,37 +257,36 @@ function update ()
 
     if (Competence_Speciale.isDown)
     {
-        if(Buta_Feu==true /*&& Dispo_BDF==true*/)
+        if(Buta_Feu==true && BDF_reload==true)
         {
             lancer_boule_de_feu(player);
-            this.physics.add.overlap(boules_de_feu, ground, destroyFireball, null, this);
-           
+            this.physics.add.collider(boules_de_feu, ground, destroyFireball, null, this);  
         }       
     }
 
     if (Competence_Speciale.isDown)
     {
-        if(Buta_Glace==true /*&& Dispo_BDG==true*/)
+        if(Buta_Glace==true && BDG_reload==true)
         {
             lancer_boule_de_glace(player);
+            this.physics.add.collider(boules_de_glace, ground, destroyIceball, null, this);
         }       
     }
-   /*  if (Competence_Speciale.isDown)
+    if (Competence_Speciale.isDown)
     {
-        if(Buta_Aile==true /*&& Dispo_Aile==true)
+        if(Buta_Aile==true)
         {
-            flying_mode(player);
+            player.setGravity(0);
+            if(cursors.down.isDown)
+            {
+                player.setVelocityY(160);    
+            }
+            if (cursors.up.isDown)
+            {
+                player.setVelocityY(-160);
+            }
         }       
-    } */
-    if(fireballPlayer == false){
-        delaiFireballPlayer --
-        }
-    if (delaiFireballPlayer <= 0 && fireballPlayer == false)  // eg, update every 10 seconds
-        {
-        delaiFireballPlayer = cooldownFireball;
-        fireballPlayer = true;
-        }
-    
+    }    
 }
 
 ///////////////////////////////////////
@@ -280,9 +295,11 @@ function update ()
 
 //Need latence entre chaque BDF ++ Block direction when touch.isUp
 function lancer_boule_de_feu(player){ 
-        var boule_de_feu = boules_de_feu.create(player.x+50, player.y-15,'boule_de_feu')
+        var boule_de_feu = boules_de_feu.create(player.x, player.y-15,'boule_de_feu')
         .setGravityY(0)
         .setScale(0.1)
+
+        this.physics.add.collider(boules_de_feu, caisse, destroyBox, null, this);    
 
         var directionFireballPlayer = Math.round(Phaser.Math.Between(0,1))
 
@@ -303,30 +320,21 @@ function lancer_boule_de_feu(player){
 
         if(playerDirection=="right"){
             /* player.play('throwFireball', true).setFlipX(false); */
-            boule_de_feu.setVelocity(400, 200);
+            boule_de_feu.setVelocity(400, 0);
         }
 
         else if(playerDirection=="left"){
             /* player.play('throwFireball', true).setFlipX(true); */
-            boule_de_feu.setVelocity(-400, 200);
+            boule_de_feu.setVelocity(-400, 0);
         }
-        Competence_Speciale.reset();
-        
+        Competence_Speciale.reset();    
+        BDF_reload=false;   
     }
-//NEED UPDATE DESTRUCTION BDF
-function destroyFireball(boules_de_feu, ground){
-        console.log("dest")
-        boules_de_feu.destroy();
-        } 
-        
-
-
 
 //Add latence entre chaque BDG
 function lancer_boule_de_glace(player){
         var boule_de_glace = boules_de_glace.create(player.x, player.y-15, 'boule_de_glace')
-        .setBounce(1)
-        .setGravityY(2000)
+        .setGravityY(0)
         .setScale(0.1)
 
         var directionIceBallPlayer = Math.round(Phaser.Math.Between(0,1))
@@ -348,20 +356,27 @@ function lancer_boule_de_glace(player){
 
         if(playerDirection=="right"){
             /* player.play('throwFireball', true).setFlipX(false); */
-            boule_de_glace.setVelocity(400, 200);
+            boule_de_glace.setVelocity(400, 0);
         }
 
         else if(playerDirection=="left"){
             /* player.play('throwFireball', true).setFlipX(true); */
-            boule_de_glace.setVelocity(-400, 200);
+            boule_de_glace.setVelocity(-400, 0);
         }
+        Competence_Speciale.reset();
+        BDG_reload=false;
     }
-//SETPLAYER TEMPORARY STATS
-/* function flying_mode(player){
-        .setGravity(0)
-        .setVelocityX(500)
-} */
 
+//NEED UPDATE DESTRUCTION BDF
+function destroyFireball(boules_de_feu, ground){
+        boules_de_feu.destroy();
+        BDF_reload=true;
+        } 
+
+function destroyIceball(boules_de_glace, ground){
+        boules_de_glace.destroy();
+        BDG_reload=true;
+        }
 ///////////////////////////////////////
 /////FIN FONCTIONS SPECIALS SKILLS/////
 ///////////////////////////////////////
@@ -374,6 +389,13 @@ function hitByPlayer(player, caisse)
     }
 }
 
+function destroyBox(boules_de_feu, caisse)
+{
+    console.log("test");
+    caisse.destroy();
+    boules_de_feu.destroy();
+    BDF_reload=true;
+}
 ///////////////////////////////////////
 //////FONCTIONS RECOLTES ELEMENTS//////
 ///////////////////////////////////////
@@ -394,11 +416,13 @@ function Recolte_Glace(player, glace)
     Buta_Aile=false;
 }
 
-/* function Recolte_Poulet(player,poulet)
+function Recolte_Poulet(player,poulet)
 {
     poulet.destroy();
     Buta_Aile=true;
-} */
+    Buta_Feu=false;
+    Buta_Glace=false;
+}
 ///////////////////////////////////////
 ////FIN FONCTIONS RECOLTES ELEMENTS////
 ///////////////////////////////////////
