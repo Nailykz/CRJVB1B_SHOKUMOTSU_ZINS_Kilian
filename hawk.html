@@ -20,7 +20,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade:{
-            gravity: {y: 300},
+            gravity: {y: 0},
             debug:true,
         }
     },
@@ -49,6 +49,9 @@ var piments;
 var lancer_boule_de_feu;
 var boules_de_feu;
 var destroyFireball;
+var cooldownFireball = 120;
+var delaiFireballPlayer = 120;
+var fireballPlayer = true
 //GLACE
 var Buta_Glace;
 var glace;
@@ -171,8 +174,8 @@ function create ()
     boules_de_feu = this.physics.add.group({
         allowGravity:true,
     });
-    this.physics.add.collider(boules_de_feu, ground);
-    this.physics.add.collider(boules_de_feu, ground, destroyFireball, null, this);
+    
+    
 
 //BOULE DE GLACE 
     boules_de_glace = this.physics.add.group({
@@ -188,6 +191,7 @@ function update ()
     player.update();
     onGround = player.body.blocked.down;
     roulade=false;
+    player.setGravityY(300);
     if (gameOver)
     {
         return;
@@ -240,6 +244,8 @@ function update ()
         if(Buta_Feu==true /*&& Dispo_BDF==true*/)
         {
             lancer_boule_de_feu(player);
+            this.physics.add.overlap(boules_de_feu, ground, destroyFireball, null, this);
+           
         }       
     }
 
@@ -257,7 +263,15 @@ function update ()
             flying_mode(player);
         }       
     } */
-
+    if(fireballPlayer == false){
+        delaiFireballPlayer --
+        }
+    if (delaiFireballPlayer <= 0 && fireballPlayer == false)  // eg, update every 10 seconds
+        {
+        delaiFireballPlayer = cooldownFireball;
+        fireballPlayer = true;
+        }
+    
 }
 
 ///////////////////////////////////////
@@ -266,13 +280,12 @@ function update ()
 
 //Need latence entre chaque BDF ++ Block direction when touch.isUp
 function lancer_boule_de_feu(player){ 
-        var boule_de_feu = boules_de_feu.create(player.x, player.y-15,'boule_de_feu')
-        .setBounce(1)
-        .setGravityY(2000)
+        var boule_de_feu = boules_de_feu.create(player.x+50, player.y-15,'boule_de_feu')
+        .setGravityY(0)
         .setScale(0.1)
 
         var directionFireballPlayer = Math.round(Phaser.Math.Between(0,1))
-        
+
         if(cursors.left.isDown){
             directionFireballPlayer=-400;
             playerDirection="left";
@@ -297,12 +310,17 @@ function lancer_boule_de_feu(player){
             /* player.play('throwFireball', true).setFlipX(true); */
             boule_de_feu.setVelocity(-400, 200);
         }
-
-//NEED UPDATE DESTRUCTION BDF
-function destroyFireball(boule_de_feu, ground){
-            boule_de_feu.destroy();
-        }
+        Competence_Speciale.reset();
+        
     }
+//NEED UPDATE DESTRUCTION BDF
+function destroyFireball(boules_de_feu, ground){
+        console.log("dest")
+        boules_de_feu.destroy();
+        } 
+        
+
+
 
 //Add latence entre chaque BDG
 function lancer_boule_de_glace(player){
