@@ -88,6 +88,7 @@ function preload ()
     this.load.image('boule_de_feu','assets/tiles/box.png');
     this.load.image('boule_de_glace','assets/tiles/box.png');
     this.load.image('poulet','assets/tiles/box.png');
+    this.load.image('aliment','assets/tiles/box.png');
     this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
 }
 
@@ -169,7 +170,7 @@ function create ()
         this.physics.add.overlap(player, glace, Recolte_Glace, null, this);
     }
 
-//APOULET
+//POULET
     const PouletObjects = map.getObjectLayer('Poulet').objects;
 
     this.poulets = this.physics.add.group({
@@ -187,6 +188,25 @@ function create ()
         this.physics.add.overlap(player, poulet, Recolte_Poulet, null, this);
     }
     
+//ALIMENT 
+
+const AlimentObjects = map.getObjectLayer('Aliment').objects;
+
+this.aliments = this.physics.add.group({
+    immovable:true,
+    allowGravity:false,
+});
+
+for(const aliment of AlimentObjects){
+    this.aliments.create(aliment.x,aliment.y,'food')
+        .setScale(0.1)
+}
+
+for(const aliment of this.poulets.children.entries){
+    this.physics.add.collider(aliment,ground);
+    this.physics.add.overlap(player, aliment, Recolte_Aliment, null, this);
+}
+
 //BOULE DE FEU
     boules_de_feu = this.physics.add.group({
         allowGravity:true,
@@ -422,6 +442,11 @@ function Recolte_Poulet(player,poulet)
     Buta_Aile=true;
     Buta_Feu=false;
     Buta_Glace=false;
+}
+
+function Recolte_Aliment(player,aliment)
+{
+    
 }
 ///////////////////////////////////////
 ////FIN FONCTIONS RECOLTES ELEMENTS////
