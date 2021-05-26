@@ -65,7 +65,9 @@ var poulets;
 var flying_mode;
 var Aile_reload = true;
 var aliment;
-var jauge;
+var aliments;
+var jauge=0;
+var jaugeText;
 //////////////
 //CONTROLES
 var Haut;
@@ -89,6 +91,7 @@ function preload ()
     this.load.image('boule_de_glace','assets/tiles/box.png');
     this.load.image('poulet','assets/tiles/box.png');
     this.load.image('aliment','assets/tiles/box.png');
+    this.load.image('ennemi','assets/tiles/box.png');
     this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
 }
 
@@ -113,7 +116,10 @@ function create ()
     Roulade = this.input.keyboard.addKey('E');
 
     this.physics.add.collider(player, ground);
-
+    jaugeText = this.add.text(30,30,'Jauge:0',
+    {
+        fontSize: '32px', fill: '#FFF'    
+    }).setScrollFactor(0);
 //CAISSE
     const CaisseObjects = map.getObjectLayer('Caisse').objects;
 
@@ -190,22 +196,42 @@ function create ()
     
 //ALIMENT 
 
-const AlimentObjects = map.getObjectLayer('Aliment').objects;
+    const AlimentObjects = map.getObjectLayer('Aliment').objects;
 
-this.aliments = this.physics.add.group({
-    immovable:true,
-    allowGravity:false,
-});
+    this.aliments = this.physics.add.group({
+        immovable:true,
+        allowGravity:false,
+    });
 
-for(const aliment of AlimentObjects){
-    this.aliments.create(aliment.x,aliment.y,'food')
-        .setScale(0.1)
-}
+    for(const aliment of AlimentObjects){
+        this.aliments.create(aliment.x, aliment.y,'food')
+            .setScale(0.1)
+    }
 
-for(const aliment of this.poulets.children.entries){
-    this.physics.add.collider(aliment,ground);
-    this.physics.add.overlap(player, aliment, Recolte_Aliment, null, this);
-}
+    for(const aliment of this.aliments.children.entries){
+        this.physics.add.collider(aliment,ground);
+        this.physics.add.overlap(player, aliment, Recolte_Aliment, null, this);
+    }
+
+//ENNEMIS 
+
+    const EnnemiObjects = map.getObjectLayer('Ennemi').objects;
+
+    this.Ennemis = this.physics.add.group({
+        immovable:true,
+        allowGravity:false,
+    });
+
+    for(const Ennemi of EnnemiObjects){
+        this.Ennemis.create(Ennemi.x, Ennemi.y,'food')
+            .setScale(0.1)
+    }
+
+    for(const Ennemi of this.Ennemis.children.entries){
+        this.physics.add.collider(Ennemi,ground);
+        this.physics.add.overlap(player, Ennemi, Fonction_Ennemi, null, this);
+
+    }
 
 //BOULE DE FEU
     boules_de_feu = this.physics.add.group({
@@ -238,16 +264,20 @@ function update ()
         player.setVelocityX(0);
     }
 
-    if (cursors.left.isDown && Roulade.isDown)
+    if (cursors.left.isDown && Roulade.isDown && jauge>0)
     {
         roulade=true;
         player.setVelocityX(-500);
+        jauge-=1;
+        jaugeText.setText('Jauge: ' + jauge);
         
     }
-    if(cursors.right.isDown && Roulade.isDown)
+    if(cursors.right.isDown && Roulade.isDown && jauge>0)
     {
         roulade=true;
         player.setVelocityX(500);
+        jauge-=1;
+        jaugeText.setText('Jauge: ' + jauge);
     }
 
     if (cursors.left.isDown && Roulade.isUp)
@@ -281,6 +311,7 @@ function update ()
         {
             lancer_boule_de_feu(player);
             this.physics.add.collider(boules_de_feu, ground, destroyFireball, null, this);  
+            this.physics.add.overlap(boules_de_feu, Ennemi, Kill_Ennemi, null, this);
         }       
     }
 
@@ -446,17 +477,24 @@ function Recolte_Poulet(player,poulet)
 
 function Recolte_Aliment(player,aliment)
 {
-    
+    aliment.destroy();
+    jauge += 10;
+    jaugeText.setText('Jauge: ' + jauge);
 }
 ///////////////////////////////////////
 ////FIN FONCTIONS RECOLTES ELEMENTS////
 ///////////////////////////////////////
 
-/* function jauge(player){
-    //ADD JAUGE
-    //ADD 10/100 PER ALIMENTS
-    //IF 100 GIVE STATUE ROULADE → ROULADE UNLOCK
-} */
+function Fonction_Ennemi(player,ennemi)
+{
+    console.log('text');
+}
+
+function Kill_Ennemi(boules_de_feu,ennemi)
+{
+    console.log('kill');
+}
+
 </script>
 
 </body>
