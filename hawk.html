@@ -43,6 +43,9 @@ var ground;
 var Touche_Caisse=false;
 var playerDirection="right";
 var destroyBox;
+var jumpCount=0;
+var doublesaut=true;
+var jump;
 //FEU
 var Buta_Feu;
 var piment;
@@ -73,6 +76,8 @@ var jaugeText;
 var ennemi;
 var ennemis;
 var movement=true;
+var timeoutDelayMovementEnnemi=15000;
+BDG_Touch=false;
 //HP
 var player_hp = 5;
 var invincible = false;
@@ -86,6 +91,7 @@ var empty_heart_2;
 var empty_heart_3;
 var empty_heart_4;
 var empty_heart_5;
+var damageOff=true;
 //////////////
 //CONTROLES
 var Haut;
@@ -260,7 +266,7 @@ function create ()
 
     for(const ennemi of this.ennemis.children.entries){
         this.physics.add.collider(ennemi, ground);
-        this.physics.add.overlap(player, ennemi, Fonction_Ennemi, null, this);
+        //this.physics.add.collider(player, ennemi, Fonction_Ennemi, null, this);
     }
 
 //BOULE DE FEU
@@ -418,6 +424,27 @@ function update ()
         else if(movement==false){
             this.ennemis.setVelocityX(0);
         }
+
+        if(doublesaut==true)
+        {
+        const isJumpJustDownup = Phaser.Input.Keyboard.JustDown(cursors.up)         
+        
+        if (isJumpJustDownup && (onGround || jumpCount < 2))
+        {
+            player.setVelocityY(-160);
+            jumpCount++
+        }
+
+        if (onGround && !isJumpJustDownup)
+        {
+            jumpCount = 0
+        }     
+        
+    }
+        if (cursors.up.isDown && jump==true || Jump.isDown && jump==true)
+        {
+            player.setVelocityY(-160);
+        }
 }
 
 ///////////////////////////////////////
@@ -559,7 +586,7 @@ function Recolte_Aliment(player,aliment)
 
 function Fonction_Ennemi(player,ennemi)
 {
-    if (invincible == false){
+    if (invincible == false && damageOff==true){
         player_hp = player_hp - 1;
         invincible = true;
         if (player_hp<=0){
@@ -568,6 +595,8 @@ function Fonction_Ennemi(player,ennemi)
         }   
         setTimeout(function(){invincible = false}, 1000);
     }
+    //REGROUPER JumpReset ET FONCTION_ENNEMI
+    if()
 }
 
 function Kill_Ennemi(boules_de_feu,ennemi)
@@ -581,10 +610,24 @@ function Gele_Ennemi(boules_de_glace,ennemi)
 {
     boules_de_glace.destroy();
     BDG_reload=true;
-    if(movement==true){
-    setTimeout(function(){movement == false}, 5000);
+    BDG_Touch=true;  
+    if(movement==true && BDG_Touch==true){
+        movement=false
+        damageOff=false;
+        this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, null, this);
+
     }
-    
+}
+
+function endStopMovement(){
+    movement=true;
+    damageOff=true;
+}
+
+function JumpReset(player, ennemi){
+    console.log("jump");
+    doublesaut=true;
+    jump=true;
 }
 
 
