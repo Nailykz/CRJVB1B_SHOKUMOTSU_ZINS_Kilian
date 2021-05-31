@@ -58,16 +58,34 @@ var glaces;
 var lancer_boule_de_glace;
 var boules_de_glace;
 var BDG_reload = true;
-//PAS TOUCHÉ//
+//AILE
 var Buta_Aile;
 var poulet;
 var poulets;
 var flying_mode;
 var Aile_reload = true;
+//ALIMENTS
 var aliment;
 var aliments;
 var jauge=0;
 var jaugeText;
+//ENNEMI
+var ennemi;
+var ennemis;
+var movement=true;
+//HP
+var player_hp = 5;
+var invincible = false;
+var full_heart_1;
+var full_heart_2;
+var full_heart_3;
+var full_heart_4;
+var full_heart_5;
+var empty_heart_1;
+var empty_heart_2;
+var empty_heart_3;
+var empty_heart_4;
+var empty_heart_5;
 //////////////
 //CONTROLES
 var Haut;
@@ -93,6 +111,8 @@ function preload ()
     this.load.image('aliment','assets/tiles/box.png');
     this.load.image('ennemi','assets/tiles/box.png');
     this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
+    this.load.image('full_heart', 'assets/full_heart.png');
+    this.load.image('empty_heart', 'assets/empty_heart.png');
 }
 
 function create ()
@@ -104,7 +124,18 @@ function create ()
     ground.setCollisionByExclusion(-1,true);
     
     player = this.physics.add.sprite(200,1550, 'dude').setScale(1.1);
-    
+    full_heart_1 = this.add.sprite(50,30, 'full_heart').setScrollFactor(0);
+    full_heart_2 = this.add.sprite(100,30, 'full_heart').setScrollFactor(0);
+    full_heart_3 = this.add.sprite(150,30, 'full_heart').setScrollFactor(0);
+    full_heart_4 = this.add.sprite(200,30, 'full_heart').setScrollFactor(0);
+    full_heart_5 = this.add.sprite(250,30, 'full_heart').setScrollFactor(0);
+        
+    empty_heart_1 = this.add.sprite(50,30, 'empty_heart').setVisible(false).setScrollFactor(0);
+    empty_heart_2 = this.add.sprite(100,30, 'empty_heart').setVisible(false).setScrollFactor(0);
+    empty_heart_3 = this.add.sprite(150,30, 'empty_heart').setVisible(false).setScrollFactor(0);
+    empty_heart_4 = this.add.sprite(200,30, 'empty_heart').setVisible(false).setScrollFactor(0);
+    empty_heart_5 = this.add.sprite(250,30, 'empty_heart').setVisible(false).setScrollFactor(0);
+
     this.cameras.main.startFollow(player);
     
     player.setBounce(0.0);
@@ -116,7 +147,7 @@ function create ()
     Roulade = this.input.keyboard.addKey('E');
 
     this.physics.add.collider(player, ground);
-    jaugeText = this.add.text(30,30,'Jauge:0',
+    jaugeText = this.add.text(30,50,'Jauge:0',
     {
         fontSize: '32px', fill: '#FFF'    
     }).setScrollFactor(0);
@@ -217,26 +248,26 @@ function create ()
 
     const EnnemiObjects = map.getObjectLayer('Ennemi').objects;
 
-    this.Ennemis = this.physics.add.group({
+    this.ennemis = this.physics.add.group({
         immovable:true,
         allowGravity:false,
     });
 
-    for(const Ennemi of EnnemiObjects){
-        this.Ennemis.create(Ennemi.x, Ennemi.y,'food')
+    for(const ennemi of EnnemiObjects){
+        this.ennemis.create(ennemi.x, ennemi.y,'ennemi')
             .setScale(0.1)
     }
 
-    for(const Ennemi of this.Ennemis.children.entries){
-        this.physics.add.collider(Ennemi,ground);
-        this.physics.add.overlap(player, Ennemi, Fonction_Ennemi, null, this);
-
+    for(const ennemi of this.ennemis.children.entries){
+        this.physics.add.collider(ennemi, ground);
+        this.physics.add.overlap(player, ennemi, Fonction_Ennemi, null, this);
     }
 
 //BOULE DE FEU
     boules_de_feu = this.physics.add.group({
         allowGravity:true,
     });
+            
     
     
 
@@ -310,8 +341,10 @@ function update ()
         if(Buta_Feu==true && BDF_reload==true)
         {
             lancer_boule_de_feu(player);
-            this.physics.add.collider(boules_de_feu, ground, destroyFireball, null, this);  
-            this.physics.add.overlap(boules_de_feu, Ennemi, Kill_Ennemi, null, this);
+            this.physics.add.collider(boules_de_feu, ground, destroyFireball, null, this);
+            this.physics.add.overlap(boules_de_feu, this.ennemis, Kill_Ennemi, null, this);
+            this.physics.add.overlap(boules_de_feu, this.caisses, destroyBox, null, this);
+            
         }       
     }
 
@@ -321,6 +354,7 @@ function update ()
         {
             lancer_boule_de_glace(player);
             this.physics.add.collider(boules_de_glace, ground, destroyIceball, null, this);
+            this.physics.add.overlap(boules_de_glace, this.ennemis, Gele_Ennemi, null, this);
         }       
     }
     if (Competence_Speciale.isDown)
@@ -337,20 +371,64 @@ function update ()
                 player.setVelocityY(-160);
             }
         }       
-    }    
+    }
+    if (player_hp == 4){
+                full_heart_5.setVisible(false);
+                empty_heart_5.setVisible(true);
+            }
+            else if (player_hp == 3){
+                full_heart_5.setVisible(false);
+                empty_heart_5.setVisible(true);
+                full_heart_4.setVisible(false);
+                empty_heart_4.setVisible(true);
+            }
+            else if (player_hp == 2){
+                full_heart_5.setVisible(false);
+                empty_heart_5.setVisible(true);
+                full_heart_4.setVisible(false);
+                empty_heart_4.setVisible(true);
+                full_heart_3.setVisible(false);
+                empty_heart_3.setVisible(true);
+            }
+            else if (player_hp == 1){
+                full_heart_5.setVisible(false);
+                empty_heart_5.setVisible(true);
+                full_heart_4.setVisible(false);
+                empty_heart_4.setVisible(true);
+                full_heart_3.setVisible(false);
+                empty_heart_3.setVisible(true);
+                full_heart_2.setVisible(false);
+                empty_heart_2.setVisible(true);
+            }
+            else if (player_hp == 0){
+                full_heart_5.setVisible(false);
+                empty_heart_5.setVisible(true);
+                full_heart_4.setVisible(false);
+                empty_heart_4.setVisible(true);
+                full_heart_3.setVisible(false);
+                empty_heart_3.setVisible(true);
+                full_heart_2.setVisible(false);
+                empty_heart_2.setVisible(true);
+                full_heart_1.setVisible(false);
+                empty_heart_1.setVisible(true);
+            }    
+        if(movement==true){
+            this.ennemis.setVelocityX(100);    
+        }
+        else if(movement==false){
+            this.ennemis.setVelocityX(0);
+        }
 }
 
 ///////////////////////////////////////
 ///////FONCTIONS SPECIALS SKILLS///////
 ///////////////////////////////////////
 
-//Need latence entre chaque BDF ++ Block direction when touch.isUp
 function lancer_boule_de_feu(player){ 
         var boule_de_feu = boules_de_feu.create(player.x, player.y-15,'boule_de_feu')
         .setGravityY(0)
         .setScale(0.1)
 
-        this.physics.add.collider(boules_de_feu, caisse, destroyBox, null, this);    
 
         var directionFireballPlayer = Math.round(Phaser.Math.Between(0,1))
 
@@ -370,19 +448,16 @@ function lancer_boule_de_feu(player){
         }
 
         if(playerDirection=="right"){
-            /* player.play('throwFireball', true).setFlipX(false); */
-            boule_de_feu.setVelocity(400, 0);
+            boule_de_feu.setVelocity(400, 0);   
         }
 
         else if(playerDirection=="left"){
-            /* player.play('throwFireball', true).setFlipX(true); */
             boule_de_feu.setVelocity(-400, 0);
         }
         Competence_Speciale.reset();    
         BDF_reload=false;   
     }
 
-//Add latence entre chaque BDG
 function lancer_boule_de_glace(player){
         var boule_de_glace = boules_de_glace.create(player.x, player.y-15, 'boule_de_glace')
         .setGravityY(0)
@@ -406,19 +481,16 @@ function lancer_boule_de_glace(player){
         }
 
         if(playerDirection=="right"){
-            /* player.play('throwFireball', true).setFlipX(false); */
             boule_de_glace.setVelocity(400, 0);
         }
 
         else if(playerDirection=="left"){
-            /* player.play('throwFireball', true).setFlipX(true); */
             boule_de_glace.setVelocity(-400, 0);
         }
         Competence_Speciale.reset();
         BDG_reload=false;
     }
 
-//NEED UPDATE DESTRUCTION BDF
 function destroyFireball(boules_de_feu, ground){
         boules_de_feu.destroy();
         BDF_reload=true;
@@ -487,13 +559,34 @@ function Recolte_Aliment(player,aliment)
 
 function Fonction_Ennemi(player,ennemi)
 {
-    console.log('text');
+    if (invincible == false){
+        player_hp = player_hp - 1;
+        invincible = true;
+        if (player_hp<=0){
+            player_hp=0;
+            this.physics.pause();
+        }   
+        setTimeout(function(){invincible = false}, 1000);
+    }
 }
 
 function Kill_Ennemi(boules_de_feu,ennemi)
 {
-    console.log('kill');
+    ennemi.destroy();
+    boules_de_feu.destroy();
+    BDF_reload=true;
 }
+
+function Gele_Ennemi(boules_de_glace,ennemi)
+{
+    boules_de_glace.destroy();
+    BDG_reload=true;
+    if(movement==true){
+    setTimeout(function(){movement == false}, 5000);
+    }
+    
+}
+
 
 </script>
 

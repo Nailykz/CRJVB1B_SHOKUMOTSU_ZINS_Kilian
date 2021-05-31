@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="185" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="26">
+<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="185" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="26">
  <editorsettings>
   <export target="RaionVille.json" format="json"/>
  </editorsettings>
@@ -144,7 +144,7 @@
   <object id="23" x="1008" y="1568" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="9" name="Ennemi">
-  <object id="24" x="1181.33" y="1572">
+  <object id="24" x="1182.66" y="1553">
    <point/>
   </object>
   <object id="25" x="540" y="1564">
