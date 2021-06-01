@@ -130,17 +130,17 @@ function create ()
     ground.setCollisionByExclusion(-1,true);
     
     player = this.physics.add.sprite(200,1550, 'dude').setScale(1.1);
-    full_heart_1 = this.add.sprite(50,30, 'full_heart').setScrollFactor(0);
-    full_heart_2 = this.add.sprite(100,30, 'full_heart').setScrollFactor(0);
-    full_heart_3 = this.add.sprite(150,30, 'full_heart').setScrollFactor(0);
-    full_heart_4 = this.add.sprite(200,30, 'full_heart').setScrollFactor(0);
-    full_heart_5 = this.add.sprite(250,30, 'full_heart').setScrollFactor(0);
+    full_heart_1 = this.add.sprite(50,30, 'full_heart').setScrollFactor(0).setScale(0.1);
+    full_heart_2 = this.add.sprite(100,30, 'full_heart').setScrollFactor(0).setScale(0.1);
+    full_heart_3 = this.add.sprite(150,30, 'full_heart').setScrollFactor(0).setScale(0.1);
+    full_heart_4 = this.add.sprite(200,30, 'full_heart').setScrollFactor(0).setScale(0.1);
+    full_heart_5 = this.add.sprite(250,30, 'full_heart').setScrollFactor(0).setScale(0.1);
         
-    empty_heart_1 = this.add.sprite(50,30, 'empty_heart').setVisible(false).setScrollFactor(0);
-    empty_heart_2 = this.add.sprite(100,30, 'empty_heart').setVisible(false).setScrollFactor(0);
-    empty_heart_3 = this.add.sprite(150,30, 'empty_heart').setVisible(false).setScrollFactor(0);
-    empty_heart_4 = this.add.sprite(200,30, 'empty_heart').setVisible(false).setScrollFactor(0);
-    empty_heart_5 = this.add.sprite(250,30, 'empty_heart').setVisible(false).setScrollFactor(0);
+    empty_heart_1 = this.add.sprite(50,30, 'empty_heart').setVisible(false).setScrollFactor(0).setScale(0.1);
+    empty_heart_2 = this.add.sprite(100,30, 'empty_heart').setVisible(false).setScrollFactor(0).setScale(0.1);
+    empty_heart_3 = this.add.sprite(150,30, 'empty_heart').setVisible(false).setScrollFactor(0).setScale(0.1);
+    empty_heart_4 = this.add.sprite(200,30, 'empty_heart').setVisible(false).setScrollFactor(0).setScale(0.1);
+    empty_heart_5 = this.add.sprite(250,30, 'empty_heart').setVisible(false).setScrollFactor(0).setScale(0.1);
 
     this.cameras.main.startFollow(player);
     
@@ -266,7 +266,7 @@ function create ()
 
     for(const ennemi of this.ennemis.children.entries){
         this.physics.add.collider(ennemi, ground);
-        //this.physics.add.collider(player, ennemi, Fonction_Ennemi, null, this);
+        this.physics.add.collider(player, ennemi, Fonction_Ennemi, null, this);
     }
 
 //BOULE DE FEU
@@ -586,7 +586,7 @@ function Recolte_Aliment(player,aliment)
 
 function Fonction_Ennemi(player,ennemi)
 {
-    if (invincible == false && damageOff==true){
+    if (invincible == false){
         player_hp = player_hp - 1;
         invincible = true;
         if (player_hp<=0){
@@ -596,7 +596,7 @@ function Fonction_Ennemi(player,ennemi)
         setTimeout(function(){invincible = false}, 1000);
     }
     //REGROUPER JumpReset ET FONCTION_ENNEMI
-    if()
+    //if()
 }
 
 function Kill_Ennemi(boules_de_feu,ennemi)
