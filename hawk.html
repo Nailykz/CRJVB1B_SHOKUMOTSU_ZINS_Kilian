@@ -77,7 +77,8 @@ var ennemi;
 var ennemis;
 var movement=true;
 var timeoutDelayMovementEnnemi=15000;
-BDG_Touch=false;
+var BDG_Touch=false;
+var onEnnemis=false;
 //HP
 var player_hp = 5;
 var invincible = false;
@@ -91,7 +92,7 @@ var empty_heart_2;
 var empty_heart_3;
 var empty_heart_4;
 var empty_heart_5;
-var damageOff=true;
+var damageOff=false;
 //////////////
 //CONTROLES
 var Haut;
@@ -113,8 +114,8 @@ function preload ()
     this.load.image('ice_cream','assets/glace.png');
     this.load.image('boule_de_feu','assets/tiles/box.png');
     this.load.image('boule_de_glace','assets/tiles/box.png');
-    this.load.image('poulet','assets/poulet.png');
-    this.load.image('aliment','assets/aliment.png');
+    this.load.image('chicken','assets/poulet.png');
+    this.load.image('food','assets/aliment.png');
     this.load.image('ennemi','assets/tiles/box.png');
     this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
     this.load.image('full_heart', 'assets/full_heart.png');
@@ -187,7 +188,7 @@ function create ()
     
     for (const piment of PimentObjects){
             this.piments.create(piment.x, piment.y, 'chilli_pepper')
-                .setScale(0.1)
+                .setScale(0.15)
         }
 
     for (const piment of this.piments.children.entries) {
@@ -206,7 +207,7 @@ function create ()
 
     for(const glace of GlaceObjects){
             this.glaces.create(glace.x, glace.y, 'ice_cream')
-                .setScale(0.1)
+                .setScale(0.07)
     }
 
     for (const glace of this.glaces.children.entries){
@@ -473,27 +474,21 @@ function update ()
             this.ennemis.setVelocityX(0);
         }
 
-        if(doublesaut==true)
+        if(doublesaut===true)
         {
         const isJumpJustDownup = Phaser.Input.Keyboard.JustDown(cursors.up)         
-        
-        if (isJumpJustDownup && (onGround || jumpCount < 2))
+        //DOUBLE SAUT SI HAUT DE CAISSE
+        if (isJumpJustDownup && (onGround || jumpCount < 2 || onEnnemis==true && jumpCount < 2) || (Touche_Caisse==true && jumpCount < 2)) 
         {
             player.setVelocityY(-160);
-            jumpCount++
+            jumpCount++;
         }
 
         if (onGround && !isJumpJustDownup)
         {
-            jumpCount = 0
+            jumpCount = 0;
         }     
-        
-        }
-        if (cursors.up.isDown && jump==true || Jump.isDown && jump==true)
-        {
-            player.setVelocityY(-160);
-        }
-
+    }
         if(jauge>=0 && jauge < 1)
         {
             jauge2.anims.play('jauge_0',true);        
@@ -615,6 +610,8 @@ function destroyIceball(boules_de_glace, ground){
 function hitByPlayer(player, caisse)
 {
     Touche_Caisse=true;
+    if(player.body.blocked.down==true)
+    {jumpCount=0;}
     if(roulade==true){
         caisse.destroy();
     }
@@ -666,7 +663,7 @@ function Recolte_Aliment(player,aliment)
 
 function Fonction_Ennemi(player,ennemi)
 {
-    if (invincible == false){
+    if (invincible == false && damageOff == false){
         player_hp = player_hp - 1;
         invincible = true;
         if (player_hp<=0){
@@ -676,7 +673,12 @@ function Fonction_Ennemi(player,ennemi)
         setTimeout(function(){invincible = false}, 1000);
     }
     //REGROUPER JumpReset ET FONCTION_ENNEMI
-    //if()
+    if(damageOff == true)
+    {
+        doublesaut=true;
+        onEnnemis=true;
+        jumpCount=0;
+    }
 }
 
 function Kill_Ennemi(boules_de_feu,ennemi)
@@ -693,7 +695,7 @@ function Gele_Ennemi(boules_de_glace,ennemi)
     BDG_Touch=true;  
     if(movement==true && BDG_Touch==true){
         movement=false
-        damageOff=false;
+        damageOff=true;
         this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, null, this);
 
     }
@@ -701,13 +703,7 @@ function Gele_Ennemi(boules_de_glace,ennemi)
 
 function endStopMovement(){
     movement=true;
-    damageOff=true;
-}
-
-function JumpReset(player, ennemi){
-    console.log("jump");
-    doublesaut=true;
-    jump=true;
+    damageOff=false;
 }
 
 
