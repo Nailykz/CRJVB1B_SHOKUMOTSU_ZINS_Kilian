@@ -61,6 +61,7 @@ var glaces;
 var lancer_boule_de_glace;
 var boules_de_glace;
 var BDG_reload = true;
+var timeoutResetSkill=1000;
 //AILE
 var Buta_Aile;
 var poulet;
@@ -109,11 +110,13 @@ var game = new Phaser.Game(config);
 function preload ()
 {
     this.load.image('tiles','assets/tiles/teste.png');
-    this.load.image('box','assets/tiles/box.png');
+    this.load.image('box','assets/box.png');
     this.load.image('chilli_pepper','assets/piment.png');
     this.load.image('ice_cream','assets/glace.png');
-    this.load.image('boule_de_feu','assets/tiles/box.png');
-    this.load.image('boule_de_glace','assets/tiles/box.png');
+    this.load.image('boule_de_feu_droit','assets/boule_de_feu_droit.png');
+    this.load.image('boule_de_feu_gauche','assets/boule_de_feu_gauche.png');
+    this.load.image('boule_de_glace_droit','assets/boule_de_glace_droit.png');
+    this.load.image('boule_de_glace_gauche','assets/boule_de_glace_gauche.png');
     this.load.image('chicken','assets/poulet.png');
     this.load.image('food','assets/aliment.png');
     this.load.image('ennemi','assets/tiles/box.png');
@@ -357,6 +360,9 @@ function update ()
         roulade=true;
         player.setVelocityX(-500);
         jauge-=1;
+        if(jauge<1){
+            player.setVelocityX(-160);
+        }
         
     }
     if(cursors.right.isDown && Roulade.isDown && jauge>0)
@@ -364,11 +370,15 @@ function update ()
         roulade=true;
         player.setVelocityX(500);
         jauge-=1;
+        if(jauge<1){
+            player.setVelocityX(160);
+        }
     }
 
     if (cursors.left.isDown && Roulade.isUp)
     {
         player.setVelocityX(-160);
+        
         
     }
     if(cursors.right.isDown && Roulade.isUp)
@@ -478,7 +488,7 @@ function update ()
         {
         const isJumpJustDownup = Phaser.Input.Keyboard.JustDown(cursors.up)         
         //DOUBLE SAUT SI HAUT DE CAISSE
-        if (isJumpJustDownup && (onGround || jumpCount < 2 || onEnnemis==true && jumpCount < 2) || (Touche_Caisse==true && jumpCount < 2)) 
+        if (isJumpJustDownup && (onGround || jumpCount < 2 || onEnnemis==true && jumpCount < 2)) 
         {
             player.setVelocityY(-160);
             jumpCount++;
@@ -528,10 +538,12 @@ function update ()
 ///////////////////////////////////////
 
 function lancer_boule_de_feu(player){ 
-        var boule_de_feu = boules_de_feu.create(player.x, player.y-15,'boule_de_feu')
+        var boule_de_feu_gauche = boules_de_feu.create(player.x, player.y-15, 'boule_de_feu_gauche')
         .setGravityY(0)
         .setScale(0.1)
-
+        var boule_de_feu_droit = boules_de_feu.create(player.x, player.y-15, 'boule_de_feu_droit')
+        .setGravityY(0)
+        .setScale(0.1)
 
         var directionFireballPlayer = Math.round(Phaser.Math.Between(0,1))
 
@@ -551,18 +563,23 @@ function lancer_boule_de_feu(player){
         }
 
         if(playerDirection=="right"){
-            boule_de_feu.setVelocity(400, 0);   
+            boule_de_feu_gauche.destroy();
+            boule_de_feu_droit.setVelocity(400, 0);   
         }
 
         else if(playerDirection=="left"){
-            boule_de_feu.setVelocity(-400, 0);
-        }
-        Competence_Speciale.reset();    
+            boule_de_feu_droit.destroy();
+            boule_de_feu_gauche.setVelocity(-400, 0);
+        }  
+        Competence_Speciale.reset();
         BDF_reload=false;   
     }
 
 function lancer_boule_de_glace(player){
-        var boule_de_glace = boules_de_glace.create(player.x, player.y-15, 'boule_de_glace')
+        var boule_de_glace_gauche = boules_de_glace.create(player.x, player.y-15, 'boule_de_glace_gauche')
+        .setGravityY(0)
+        .setScale(0.1)
+        var boule_de_glace_droit = boules_de_glace.create(player.x, player.y-15, 'boule_de_glace_droit')
         .setGravityY(0)
         .setScale(0.1)
 
@@ -571,10 +588,12 @@ function lancer_boule_de_glace(player){
         if(cursors.left.isDown){
             directionIceBallPlayer=-400;
             playerDirection="left";
+            
         }
         else if(cursors.right.isDown){
             directionIceBallPlayer=400;
             playerDirection="right";
+            
         }
         else if(cursors.right.isUp && cursors.left.isUp && cursors.up.isUp && directionIceBallPlayer==1){
             directionIceBallPlayer=400;
@@ -584,13 +603,14 @@ function lancer_boule_de_glace(player){
         }
 
         if(playerDirection=="right"){
-            boule_de_glace.setVelocity(400, 0);
+            boule_de_glace_gauche.destroy();
+            boule_de_glace_droit.setVelocity(400, 0);
         }
 
         else if(playerDirection=="left"){
-            boule_de_glace.setVelocity(-400, 0);
+            boule_de_glace_droit.destroy();
+            boule_de_glace_gauche.setVelocity(-400, 0);
         }
-        Competence_Speciale.reset();
         BDG_reload=false;
     }
 
@@ -697,7 +717,6 @@ function Gele_Ennemi(boules_de_glace,ennemi)
         movement=false
         damageOff=true;
         this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, null, this);
-
     }
 }
 
@@ -705,7 +724,6 @@ function endStopMovement(){
     movement=true;
     damageOff=false;
 }
-
 
 </script>
 
