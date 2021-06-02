@@ -109,16 +109,19 @@ function preload ()
 {
     this.load.image('tiles','assets/tiles/teste.png');
     this.load.image('box','assets/tiles/box.png');
-    this.load.image('chilli_pepper','assets/tiles/box.png');
-    this.load.image('ice_cream','assets/tiles/box.png');
+    this.load.image('chilli_pepper','assets/piment.png');
+    this.load.image('ice_cream','assets/glace.png');
     this.load.image('boule_de_feu','assets/tiles/box.png');
     this.load.image('boule_de_glace','assets/tiles/box.png');
-    this.load.image('poulet','assets/tiles/box.png');
-    this.load.image('aliment','assets/tiles/box.png');
+    this.load.image('poulet','assets/poulet.png');
+    this.load.image('aliment','assets/aliment.png');
     this.load.image('ennemi','assets/tiles/box.png');
     this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
     this.load.image('full_heart', 'assets/full_heart.png');
     this.load.image('empty_heart', 'assets/empty_heart.png');
+    this.load.spritesheet('sprite', 'assets/spritesheet.png', { frameWidth:398, frameHeight:228});
+    
+
 }
 
 function create ()
@@ -142,6 +145,8 @@ function create ()
     empty_heart_4 = this.add.sprite(200,30, 'empty_heart').setVisible(false).setScrollFactor(0).setScale(0.1);
     empty_heart_5 = this.add.sprite(250,30, 'empty_heart').setVisible(false).setScrollFactor(0).setScale(0.1);
 
+    jauge2 = this.add.sprite(100,75, 'sprite').setScale(0.4).setScrollFactor(0);
+
     this.cameras.main.startFollow(player);
     
     player.setBounce(0.0);
@@ -153,10 +158,6 @@ function create ()
     Roulade = this.input.keyboard.addKey('E');
 
     this.physics.add.collider(player, ground);
-    jaugeText = this.add.text(30,50,'Jauge:0',
-    {
-        fontSize: '32px', fill: '#FFF'    
-    }).setScrollFactor(0);
 //CAISSE
     const CaisseObjects = map.getObjectLayer('Caisse').objects;
 
@@ -281,8 +282,57 @@ function create ()
     boules_de_glace = this.physics.add.group({
         allowGravity:true,
     });
-}
 
+//Anim_JAUGE
+    this.anims.create({
+            key: 'jauge_0',
+            frames: this.anims.generateFrameNumbers('sprite', { start: 0, end: 0 }),
+            frameRate: 10,
+            repeat: -1
+            });
+    this.anims.create({
+            key: 'jauge_10',
+            frames: this.anims.generateFrameNumbers('sprite', { start: 1, end: 1 }),
+            frameRate: 10,
+            repeat: -1
+            });
+    this.anims.create({
+            key: 'jauge_25',
+            frames: this.anims.generateFrameNumbers('sprite', { start: 2, end: 2 }),
+            frameRate: 10,
+            repeat: -1
+            });
+    this.anims.create({
+            key: 'jauge_40',
+            frames: this.anims.generateFrameNumbers('sprite', { start: 3, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+            });      
+    this.anims.create({
+            key: 'jauge_55',
+            frames: this.anims.generateFrameNumbers('sprite', { start: 4, end: 4 }),
+            frameRate: 10,
+            repeat: -1
+            });      
+    this.anims.create({
+            key: 'jauge_70',
+            frames: this.anims.generateFrameNumbers('sprite', { start: 5, end: 5 }),
+            frameRate: 10,
+            repeat: -1
+            });  
+    this.anims.create({
+            key: 'jauge_85',
+            frames: this.anims.generateFrameNumbers('sprite', { start: 6, end: 6 }),
+            frameRate: 10,
+            repeat: -1
+            });     
+    this.anims.create({
+            key: 'jauge_100',
+            frames: this.anims.generateFrameNumbers('sprite', { start: 7, end: 7 }),
+            frameRate: 10,
+            repeat: -1
+            }); 
+        }
 //CONTROLE 
 function update ()
 {
@@ -306,7 +356,6 @@ function update ()
         roulade=true;
         player.setVelocityX(-500);
         jauge-=1;
-        jaugeText.setText('Jauge: ' + jauge);
         
     }
     if(cursors.right.isDown && Roulade.isDown && jauge>0)
@@ -314,7 +363,6 @@ function update ()
         roulade=true;
         player.setVelocityX(500);
         jauge-=1;
-        jaugeText.setText('Jauge: ' + jauge);
     }
 
     if (cursors.left.isDown && Roulade.isUp)
@@ -440,10 +488,43 @@ function update ()
             jumpCount = 0
         }     
         
-    }
+        }
         if (cursors.up.isDown && jump==true || Jump.isDown && jump==true)
         {
             player.setVelocityY(-160);
+        }
+
+        if(jauge>=0 && jauge < 1)
+        {
+            jauge2.anims.play('jauge_0',true);        
+        }
+        if(jauge>=1 && jauge < 25)
+        {
+            jauge2.anims.play('jauge_10',true);   
+        }
+        if(jauge>=25 && jauge < 40)
+        {
+            jauge2.anims.play('jauge_25',true);  
+        }
+        if(jauge>=40 && jauge < 55)
+        {
+            jauge2.anims.play('jauge_40',true); 
+        }
+        if(jauge>=55 && jauge < 70)
+        {
+            jauge2.anims.play('jauge_55',true); 
+        }
+        if(jauge>=70 && jauge < 85)
+        {
+            jauge2.anims.play('jauge_70',true); 
+        }
+        if(jauge>=85 && jauge < 100)
+        {
+            jauge2.anims.play('jauge_85',true); 
+        }
+        if(jauge >= 100)
+        {
+            jauge2.anims.play('jauge_100',true); 
         }
 }
 
@@ -578,7 +659,6 @@ function Recolte_Aliment(player,aliment)
 {
     aliment.destroy();
     jauge += 10;
-    jaugeText.setText('Jauge: ' + jauge);
 }
 ///////////////////////////////////////
 ////FIN FONCTIONS RECOLTES ELEMENTS////
