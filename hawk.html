@@ -68,6 +68,7 @@ var poulet;
 var poulets;
 var flying_mode;
 var Aile_reload = true;
+var undefined_jauge=100;
 //ALIMENTS
 var aliment;
 var aliments;
@@ -120,7 +121,8 @@ function preload ()
     this.load.image('chicken','assets/poulet.png');
     this.load.image('food','assets/aliment.png');
     this.load.image('ennemi','assets/tiles/box.png');
-    this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
+    //this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
+    this.load.tilemapTiledJSON('map','assets/tiles/Raion_Full.json');
     this.load.image('full_heart', 'assets/full_heart.png');
     this.load.image('empty_heart', 'assets/empty_heart.png');
     this.load.spritesheet('sprite', 'assets/spritesheet.png', { frameWidth:398, frameHeight:228});
@@ -135,7 +137,11 @@ function create ()
 
     ground = map.createDynamicLayer('Ville',tileset);
     ground.setCollisionByExclusion(-1,true);
-    
+    background = map.createDynamicLayer('Faux_Murs',tileset);
+    this.death_zone = map.createDynamicLayer('Death_Zone',tileset);
+    this.death_zone.setCollisionByExclusion(-1,true);
+
+
     player = this.physics.add.sprite(200,1550, 'dude').setScale(1.1);
     full_heart_1 = this.add.sprite(50,30, 'full_heart').setScrollFactor(0).setScale(0.1);
     full_heart_2 = this.add.sprite(100,30, 'full_heart').setScrollFactor(0).setScale(0.1);
@@ -162,6 +168,7 @@ function create ()
     Roulade = this.input.keyboard.addKey('E');
 
     this.physics.add.collider(player, ground);
+    this.physics.add.collider(player, this.death_zone, death_Zone_Spawnpoint, null, this);
 //CAISSE
     const CaisseObjects = map.getObjectLayer('Caisse').objects;
 
@@ -180,6 +187,7 @@ function create ()
         this.physics.add.collider(player, caisse, hitByPlayer, null, this);        
     }       
         this.physics.add.collider(this.caisses, this.caisses);
+
 
 //PIMENT
     const PimentObjects = map.getObjectLayer('Piment').objects;
@@ -336,7 +344,8 @@ function create ()
             frameRate: 10,
             repeat: -1
             }); 
-        }
+
+}
 //CONTROLE 
 function update ()
 {
@@ -424,16 +433,18 @@ function update ()
     }
     if (Competence_Speciale.isDown)
     {
-        if(Buta_Aile==true)
+        if(Buta_Aile==true && undefined_jauge>0)
         {
             player.setGravity(0);
             if(cursors.down.isDown)
             {
-                player.setVelocityY(160);    
+                player.setVelocityY(160);
+                undefined_jauge-=1;   
             }
             if (cursors.up.isDown)
             {
                 player.setVelocityY(-160);
+                undefined_jauge-=1; 
             }
         }       
     }
@@ -478,7 +489,7 @@ function update ()
                 empty_heart_1.setVisible(true);
             }    
         if(movement==true){
-            this.ennemis.setVelocityX(100);    
+            this.ennemis.setVelocityX(0);    
         }
         else if(movement==false){
             this.ennemis.setVelocityX(0);
@@ -531,6 +542,8 @@ function update ()
         {
             jauge2.anims.play('jauge_100',true); 
         }
+                    
+
 }
 
 ///////////////////////////////////////
@@ -670,6 +683,7 @@ function Recolte_Poulet(player,poulet)
     Buta_Aile=true;
     Buta_Feu=false;
     Buta_Glace=false;
+    undefined_jauge=100;
 }
 
 function Recolte_Aliment(player,aliment)
@@ -723,6 +737,13 @@ function Gele_Ennemi(boules_de_glace,ennemi)
 function endStopMovement(){
     movement=true;
     damageOff=false;
+}
+
+function death_Zone_Spawnpoint(){
+    console.log("death")
+        //player.setPosition(1850, 1350);
+            player.x=1850;
+            player.y=1350;  
 }
 
 </script>
