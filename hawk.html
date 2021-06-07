@@ -32,6 +32,8 @@ var config = {
 };
 
 var player;
+var playerBlockedDown = false;
+var inContactCaisse = false;
 var cursors;
 var caisses
 var caisse;
@@ -110,6 +112,7 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
+    this.load.image('bg', 'assets/decor.jpg');
     this.load.image('tiles','assets/tiles/teste.png');
     this.load.image('box','assets/box.png');
     this.load.image('chilli_pepper','assets/piment.png');
@@ -120,7 +123,7 @@ function preload ()
     this.load.image('boule_de_glace_gauche','assets/boule_de_glace_gauche.png');
     this.load.image('chicken','assets/poulet.png');
     this.load.image('food','assets/aliment.png');
-    this.load.image('ennemi','assets/tiles/box.png');
+    this.load.image('ennemi','assets/Perso_3.png');
     //this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
     this.load.tilemapTiledJSON('map','assets/tiles/Raion_Full.json');
     this.load.image('full_heart', 'assets/full_heart.png');
@@ -132,6 +135,7 @@ function preload ()
 
 function create ()
 {  
+    this.add.image(650, 1100, 'bg');
     const map = this.make.tilemap({key : 'map'});
     const tileset = map.addTilesetImage('teste','tiles');
 
@@ -184,6 +188,7 @@ function create ()
 
     for (const caisse of this.caisses.children.entries) {
         this.physics.add.collider(caisse, ground);
+        this.physics.add.collider(caisse, ennemi);
         this.physics.add.collider(player, caisse, hitByPlayer, null, this);        
     }       
         this.physics.add.collider(this.caisses, this.caisses);
@@ -268,27 +273,28 @@ function create ()
     const EnnemiObjects = map.getObjectLayer('Ennemi').objects;
 
     this.ennemis = this.physics.add.group({
-        immovable:true,
-        allowGravity:false,
+        immovable:false,
+        allowGravity:true,
     });
 
     for(const ennemi of EnnemiObjects){
-        this.ennemis.create(ennemi.x, ennemi.y,'ennemi')
-            .setScale(0.1)
+        this.ennemis.create(ennemi.x, ennemi.y-50,'ennemi')
+            .setScale(0.2)
+            .setGravityY(300);
     }
 
     for(const ennemi of this.ennemis.children.entries){
         this.physics.add.collider(ennemi, ground);
+        this.physics.add.collider(ennemi, this.caisses);
         this.physics.add.collider(player, ennemi, Fonction_Ennemi, null, this);
+        ennemi.direction = 'RIGHT'
     }
+    
 
 //BOULE DE FEU
     boules_de_feu = this.physics.add.group({
         allowGravity:true,
-    });
-            
-    
-    
+    });  
 
 //BOULE DE GLACE 
     boules_de_glace = this.physics.add.group({
@@ -346,14 +352,19 @@ function create ()
             }); 
 
 }
-//CONTROLE 
+//CONTROLE
+//GOUPDATE 
 function update ()
 {
-    
     player.update();
     onGround = player.body.blocked.down;
     roulade=false;
     player.setGravityY(300);
+    if(player.body.blocked.down==true || inContactCaisse == true){
+        playerBlockedDown=true;
+        jumpCount=0;
+    }
+
     if (gameOver)
     {
         return;
@@ -370,7 +381,7 @@ function update ()
         player.setVelocityX(-500);
         jauge-=1;
         if(jauge<1){
-            player.setVelocityX(-160);
+            player.setVelocityX(-170);
         }
         
     }
@@ -380,34 +391,39 @@ function update ()
         player.setVelocityX(500);
         jauge-=1;
         if(jauge<1){
-            player.setVelocityX(160);
+            player.setVelocityX(170);
         }
     }
 
     if (cursors.left.isDown && Roulade.isUp)
     {
-        player.setVelocityX(-160);
+        player.setVelocityX(-170);
         
         
     }
     if(cursors.right.isDown && Roulade.isUp)
     {
-        player.setVelocityX(160);
+        player.setVelocityX(170);
     }
       
     if (cursors.up.isDown && onGround==true || Jump.isDown && onGround==true)
     {
-        player.setVelocityY(-160);
+        player.setVelocityY(-170);
+        inContactCaisse = false;
     }
     if (cursors.up.isDown && Touche_Caisse==true || Jump.isDown && Touche_Caisse==true)
     {
         Touche_Caisse=false;
-        player.setVelocityY(-160);
+        player.setVelocityY(-170);
+        inContactCaisse = false;
+       
     }
 
     if(cursors.down.isDown)
     {
-        player.setVelocityY(160);    
+        player.setVelocityY(170);  
+        inContactCaisse = false;
+  
     }
 
     if (Competence_Speciale.isDown)
@@ -438,12 +454,12 @@ function update ()
             player.setGravity(0);
             if(cursors.down.isDown)
             {
-                player.setVelocityY(160);
+                player.setVelocityY(170);
                 undefined_jauge-=1;   
             }
             if (cursors.up.isDown)
             {
-                player.setVelocityY(-160);
+                player.setVelocityY(-170);
                 undefined_jauge-=1; 
             }
         }       
@@ -488,12 +504,27 @@ function update ()
                 full_heart_1.setVisible(false);
                 empty_heart_1.setVisible(true);
             }    
-        if(movement==true){
-            this.ennemis.setVelocityX(0);    
-        }
-        else if(movement==false){
-            this.ennemis.setVelocityX(0);
-        }
+            
+            for (const ennemi of this.ennemis.children.entries) {
+
+                if (ennemi.body.blocked.right || ennemi.body.touching.right) {
+                    ennemi.direction = 'LEFT';
+                }
+
+                if (ennemi.body.blocked.left || ennemi.body.touching.left) {
+                    ennemi.direction = 'RIGHT';
+                }
+
+                if (ennemi.direction === 'RIGHT') {
+                    ennemi.setVelocityX(150);
+                } else if(ennemi.direction === 'LEFT') {
+                    ennemi.setVelocityX(-150);
+                }
+                else if(ennemi.direction === 'Stop'){
+                    ennemi.setVelocityX(0);
+
+                }
+            }
 
         if(doublesaut===true)
         {
@@ -501,7 +532,7 @@ function update ()
         //DOUBLE SAUT SI HAUT DE CAISSE
         if (isJumpJustDownup && (onGround || jumpCount < 2 || onEnnemis==true && jumpCount < 2)) 
         {
-            player.setVelocityY(-160);
+            player.setVelocityY(-170);
             jumpCount++;
         }
 
@@ -642,9 +673,12 @@ function destroyIceball(boules_de_glace, ground){
 
 function hitByPlayer(player, caisse)
 {
-    Touche_Caisse=true;
-    if(player.body.blocked.down==true)
-    {jumpCount=0;}
+    if(playerBlockedDown==true)
+    {
+        inContactCaisse = true;
+        playerBlockedDown=false;
+        Touche_Caisse=true;
+    }
     if(roulade==true){
         caisse.destroy();
     }
@@ -652,7 +686,6 @@ function hitByPlayer(player, caisse)
 
 function destroyBox(boules_de_feu, caisse)
 {
-    console.log("test");
     caisse.destroy();
     boules_de_feu.destroy();
     BDF_reload=true;
@@ -697,7 +730,13 @@ function Recolte_Aliment(player,aliment)
 
 function Fonction_Ennemi(player,ennemi)
 {
-    if (invincible == false && damageOff == false){
+    if(ennemi.direction=='Stop')
+    {
+        doublesaut=true;
+        onEnnemis=true;
+        jumpCount=0;
+    }
+    else if (invincible == false){
         player_hp = player_hp - 1;
         invincible = true;
         if (player_hp<=0){
@@ -707,12 +746,7 @@ function Fonction_Ennemi(player,ennemi)
         setTimeout(function(){invincible = false}, 1000);
     }
     //REGROUPER JumpReset ET FONCTION_ENNEMI
-    if(damageOff == true)
-    {
-        doublesaut=true;
-        onEnnemis=true;
-        jumpCount=0;
-    }
+
 }
 
 function Kill_Ennemi(boules_de_feu,ennemi)
@@ -727,15 +761,16 @@ function Gele_Ennemi(boules_de_glace,ennemi)
     boules_de_glace.destroy();
     BDG_reload=true;
     BDG_Touch=true;  
-    if(movement==true && BDG_Touch==true){
+    if(ennemi.movement!== 'Stop' && BDG_Touch==true){
+        ennemi.direction='Stop';
         movement=false
         damageOff=true;
-        this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, null, this);
+        this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [ennemi], this);
     }
 }
 
-function endStopMovement(){
-    movement=true;
+function endStopMovement(ennemi){
+    ennemi.direction='RIGHT';
     damageOff=false;
 }
 
