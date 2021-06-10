@@ -381,6 +381,17 @@
                  "width":0,
                  "x":2464,
                  "y":1264
+                }, 
+                {
+                 "height":16,
+                 "id":107,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":78,
+                 "y":1442
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -568,10 +579,10 @@
          "y":0
         }],
  "nextlayerid":22,
- "nextobjectid":107,
+ "nextobjectid":108,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.4.2",
+ "tiledversion":"1.5.0",
  "tileheight":16,
  "tilesets":[
         {
@@ -589,6 +600,6 @@
         }],
  "tilewidth":16,
  "type":"map",
- "version":1.4,
+ "version":1.5,
  "width":185
 }
