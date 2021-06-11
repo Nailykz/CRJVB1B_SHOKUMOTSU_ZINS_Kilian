@@ -133,6 +133,7 @@ function preload ()
     this.load.tilemapTiledJSON('map','assets/tiles/Raion_Full.json');
     this.load.image('full_heart', 'assets/full_heart.png');
     this.load.image('empty_heart', 'assets/empty_heart.png');
+    this.load.spritesheet('ennemi_freeze','assets/BG_FX_glace.png', {frameWidth:500, frameHeight:500});
     this.load.spritesheet('sprite', 'assets/spritesheet.png', { frameWidth:398, frameHeight:228});
     this.load.spritesheet('sprite_buta_normal', 'assets/sprite_buta_normal.png', { frameWidth:988, frameHeight:800});
     this.load.spritesheet('sprite_buta_feu', 'assets/sprite_buta_feu.png', { frameWidth:988, frameHeight:800});
@@ -599,7 +600,15 @@ function create ()
             frames: this.anims.generateFrameNumbers('sprite_buta_aile', {start: 10, end: 10}),
             frameRate: 10,
             repeat: -1
-    }); 
+    });
+
+
+    this.anims.create({
+            key: 'Freeze',
+            frames: this.anims.generateFrameNumbers('BG_FX_glace', {start: 0, end: 0}),
+            frameRate: 10,
+            repeat: -1
+    });  
 
 }
 //CONTROLE
@@ -787,7 +796,9 @@ function update ()
             player.setVelocityX(170);
         }
     }
+
 ////////////////////
+
     if(player.body.blocked.down==true || inContactCaisse == true){
         playerBlockedDown=true;
         jumpCount=0;
@@ -911,6 +922,7 @@ function update ()
             for (const ennemi of this.ennemis.children.entries) {
             if(ennemi.direction=='Stop'){
                 ennemi.setVelocityX(0);
+                ennemi.anims.play('Freeze',true);
             }
             else if(ennemi.direction!=='Stop'){
                 if (ennemi.body.blocked.right || ennemi.body.touching.right) {
@@ -1141,6 +1153,7 @@ function Fonction_Ennemi(player,ennemi)
         doublesaut=true;
         onEnnemis=true;
         jumpCount=0;
+        
     }
     else if (invincible == false){
         player_hp = player_hp - 1;
@@ -1171,6 +1184,8 @@ function Gele_Ennemi(boules_de_glace,ennemi)
         ennemi.direction='Stop';
         movement=false;
         damageOff=true;
+        this.physics.add.collider(ennemi, ground);
+        this.physics.add.collider(ennemi, caisses);
         this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [ennemi], this);
     }
 }
@@ -1186,7 +1201,6 @@ function death_Zone_Spawnpoint(){
             player.x=1850;
             player.y=1350;  
 }
-
 /* function AnimRoulade(){
     console.log("11")
     player.anims.play('buta_aile_roulade_gauche_charge', true)
