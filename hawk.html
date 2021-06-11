@@ -117,7 +117,7 @@ var game = new Phaser.Game(config);
 function preload ()
 {
     this.load.image('bg', 'assets/decor.jpg');
-    this.load.image('tiles','assets/tiles/teste.png');
+    this.load.image('tiles','assets/tiles/tiles.png');
     this.load.image('box','assets/box.png');
     this.load.image('bnormal','assets/buta.png');
     this.load.image('chilli_pepper','assets/piment.png');
@@ -144,9 +144,9 @@ function preload ()
 
 function create ()
 {  
-    this.add.image(650, 1100, 'bg');
+    this.add.image(640, 1100, 'bg').setOrigin(0.5,0.5);
     const map = this.make.tilemap({key : 'map'});
-    const tileset = map.addTilesetImage('teste','tiles');
+    const tileset = map.addTilesetImage('tiles','tiles');
 
     ground = map.createDynamicLayer('Ville',tileset);
     ground.setCollisionByExclusion(-1,true);
@@ -484,19 +484,19 @@ function create ()
     }); 
     this.anims.create({
             key: 'buta_aile_saut_gauche',
-            frames: this.anims.generateFrameNumbers('sprite_buta_aile', {start: 2, end: 2}),
+            frames: this.anims.generateFrameNumbers('sprite_buta_aile_vole', {start: 2, end: 2}),
             frameRate: 10,
             repeat: -1
     });
     this.anims.create({
             key: 'buta_aile_vole_droite',
-            frames: this.anims.generateFrameNumbers('sprite_buta_aile_vole', {start: 0, end: 2}),
+            frames: this.anims.generateFrameNumbers('sprite_buta_aile_vole', {start: 0, end: 0}),
             frameRate: 10,
             repeat: -1
     });
     this.anims.create({
             key: 'buta_aile_vole_gauche',
-            frames: this.anims.generateFrameNumbers('sprite_buta_aile_vole', {start: 3, end: 5}),
+            frames: this.anims.generateFrameNumbers('sprite_buta_aile_vole', {start: 5, end: 5}),
             frameRate: 10,
             repeat: -1
     }); 
@@ -675,10 +675,10 @@ function update ()
         if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_Aile == true|| cursors.left.isDown && onGround==false && Buta_Aile == true){
             player.anims.play('buta_aile_saut_gauche', true);
         }
-        if(cursors.right.isDown && Buta_Aile == true && Competence_Speciale.isDown && onGround==false || cursors.right.isDown && cursors.up.isDown && Buta_Aile == true && Competence_Speciale.isDown && onGround==false ){
+        if(cursors.right.isDown && Buta_Aile == true && Competence_Speciale.isDown || cursors.right.isDown && cursors.up.isDown && Buta_Aile == true && Competence_Speciale.isDown){
             player.anims.play('buta_aile_vole_droite', true);
         }
-        if(cursors.left.isDown && Buta_Aile == true && Competence_Speciale.isDown && onGround==false || cursors.left.isDown && cursors.up.isDown && Buta_Aile == true && Competence_Speciale.isDown && onGround==false){
+        if(cursors.left.isDown && Buta_Aile == true && Competence_Speciale.isDown|| cursors.left.isDown && cursors.up.isDown && Buta_Aile == true && Competence_Speciale.isDown){
             player.anims.play('buta_aile_vole_gauche', true);
         }
 
@@ -767,6 +767,7 @@ function update ()
         player.anims.play('buta_aile_roulade_gauche', true);
         player.anims.play('buta_aile_roulade_gauche', false);
         player.anims.play('buta_aile_roulade_gauche_charge', true);
+        //this.time.delayedCall(1000, AnimRoulade, null, this);
         roulade=true;
         player.setVelocityX(-500);
         jauge-=1;
@@ -1141,7 +1142,7 @@ function Fonction_Ennemi(player,ennemi)
         onEnnemis=true;
         jumpCount=0;
     }
-    else if (invincible == false && damageOff == false){
+    else if (invincible == false){
         player_hp = player_hp - 1;
         invincible = true;
         if (player_hp<=0){
@@ -1185,6 +1186,11 @@ function death_Zone_Spawnpoint(){
             player.x=1850;
             player.y=1350;  
 }
+
+/* function AnimRoulade(){
+    console.log("11")
+    player.anims.play('buta_aile_roulade_gauche_charge', true)
+} */
 
 </script>
 
