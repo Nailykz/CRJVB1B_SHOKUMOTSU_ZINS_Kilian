@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <title>Mario like Inchallah j'y arrive</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="menu.js"></script>
+    <script src="shokumotsu.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -17,6 +19,7 @@ var config = {
     type: Phaser.AUTO,
     width: 896,
     height: 448,
+    backgroundColor: '#0E798D',
     physics: {
         default: 'arcade',
         arcade:{
@@ -24,7 +27,7 @@ var config = {
             debug:true,
         }
     },
-    scene: [menu, hawk]
+    scene: [menu, shokumotsu]
 };
 
     var game = new Phaser.Game(config);
