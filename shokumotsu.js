@@ -49,6 +49,7 @@ create ()
 
     this.physics.add.collider(player, ground);
     this.physics.add.collider(player, this.death_zone, death_Zone_Spawnpoint, null, this);
+
 //CAISSE
     const CaisseObjects = map.getObjectLayer('Caisse').objects;
 
@@ -166,6 +167,24 @@ create ()
         ennemi.direction = 'RIGHT';
     }
     
+//RESPAWNING_POULET
+/*     const Respawn_PouletObjects = map.getObjectLayer('Respawn_Poulet').objects;
+
+        this.respawn_poulets = this.physics.add.group({
+            immovable:true,
+            allowGravity:false,
+        });
+
+        for(const respawn_poulet of PouletObjects){
+                this.respawn_poulets.create(respawn_poulet.x, respawn_poulet.y, 'chicken')
+                    .setScale(0.1)
+        }
+
+        for (const respawn_poulet of this.respawn_poulets.children.entries){
+            this.physics.add.collider(respawn_poulet, ground);
+            this.physics.add.overlap(player, respawn_poulet, Recolte_Respawn_Poulet, null, this);
+        } */
+
 
 //BOULE DE FEU
     boules_de_feu = this.physics.add.group({
@@ -999,6 +1018,17 @@ function Recolte_Aliment(player,aliment)
     aliment.destroy();
     jauge += 10;
 }
+
+/* function Recolte_Respawn_Poulet(player,respawn_poulet)
+{
+    Buta_normal=false;
+    Buta_Aile=true;
+    Buta_Feu=false;
+    Buta_Glace=false;
+    undefined_jauge=100;
+} */
+
+
 ///////////////////////////////////////
 ////FIN FONCTIONS RECOLTES ELEMENTS////
 ///////////////////////////////////////
