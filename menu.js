@@ -69,6 +69,7 @@ var movement=true;
 var timeoutDelayMovementEnnemi=5000;
 var BDG_Touch=false;
 var onEnnemis=false;
+var bool_hide_ennemi=false;
 //HP
 var player_hp = 5;
 var invincible = false;

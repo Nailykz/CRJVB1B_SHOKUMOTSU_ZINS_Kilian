@@ -151,14 +151,14 @@ create ()
 
 //ENNEMIS 
 
-    const EnnemiObjects = map.getObjectLayer('Ennemi').objects;
+    this.EnnemiObjects = map.getObjectLayer('Ennemi').objects;
 
     this.ennemis = this.physics.add.group({
         immovable:false,
         allowGravity:true,
     });
 
-    for(const ennemi of EnnemiObjects){
+    for(const ennemi of this.EnnemiObjects){
         this.ennemis.create(ennemi.x, ennemi.y-50,'ennemi')
             .setScale(0.2)
             .setGravityY(300);
@@ -169,6 +169,27 @@ create ()
         this.physics.add.collider(ennemi, this.caisses);
         this.physics.add.collider(player, ennemi, Fonction_Ennemi, null, this);
         ennemi.direction = 'RIGHT';
+    }
+
+//HIDE_ENNEMIS 
+
+    this.Hide_EnnemiObjects = map.getObjectLayer('Hide_Ennemi').objects;
+
+    this.hide_ennemis = this.physics.add.group({
+        immovable:true,
+        allowGravity:true,
+    });
+
+    for(const hide_ennemi of this.Hide_EnnemiObjects){
+        this.hide_ennemis.create(hide_ennemi.x, hide_ennemi.y-50,'ennemi')
+            .setScale(0.2)
+            .setGravityY(300);
+    }
+
+    for(const hide_ennemi of this.hide_ennemis.children.entries){
+        this.physics.add.collider(hide_ennemi, ground);
+        this.physics.add.collider(hide_ennemi, this.caisses);
+        this.physics.add.collider(player, hide_ennemi, Fonction_Hide_Ennemi, null, this);
     }
     
 //RESPAWNING_POULET
@@ -764,6 +785,7 @@ update ()
             lancer_boule_de_feu(player);
             this.physics.add.collider(boules_de_feu, ground, destroyFireball, null, this);
             this.physics.add.overlap(boules_de_feu, this.ennemis, Kill_Ennemi, null, this);
+            this.physics.add.overlap(boules_de_feu, this.hide_ennemis, Hide_Ennemi, null, this);
             this.physics.add.overlap(boules_de_feu, this.caisses, destroyBox, null, this);  
         }       
     }
@@ -775,6 +797,7 @@ update ()
             lancer_boule_de_glace(player);
             this.physics.add.collider(boules_de_glace, ground, destroyIceball, null, this);
             this.physics.add.overlap(boules_de_glace, this.ennemis, Gele_Ennemi, null, this);
+            this.physics.add.overlap(boules_de_glace, this.hide_ennemis, Gele_Ennemi, null, this);
         }       
     }
     if (Competence_Speciale.isDown)
@@ -1104,8 +1127,26 @@ function Fonction_Ennemi(player,ennemi)
         }   
         setTimeout(function(){invincible = false}, 1000);
     }
-    //REGROUPER JumpReset ET FONCTION_ENNEMI
 
+    //REGROUPER JumpReset ET FONCTION_ENNEMI
+}
+
+function Fonction_Hide_Ennemi(player, hide_ennemi){
+    if(hide_ennemi.direction=='Stop')
+    {
+        doublesaut=true;
+        onEnnemis=true;
+        jumpCount=0; 
+    }
+    else if (invincible == false && bool_hide_ennemi==false){
+        player_hp = player_hp - 1;
+        invincible = true;
+        if (player_hp<=0){
+            player_hp=0;
+            this.physics.pause();
+        }   
+        setTimeout(function(){invincible = false}, 1000);
+    }
 }
 
 function Kill_Ennemi(boules_de_feu,ennemi)
@@ -1113,6 +1154,17 @@ function Kill_Ennemi(boules_de_feu,ennemi)
     ennemi.destroy();
     boules_de_feu.destroy();
     BDF_reload=true;
+}
+
+function Hide_Ennemi(boules_de_feu,hide_ennemi)
+{
+    for(const hide_ennemi of this.hide_ennemis.children.entries){
+hide_ennemi.destroy()
+    }
+   // hide_ennemi.setVisible(false);
+    boules_de_feu.destroy();
+    BDF_reload=true;
+    bool_hide_ennemi=true;
 }
 
 function Gele_Ennemi(boules_de_glace,ennemi)
@@ -1138,17 +1190,41 @@ function endStopMovement(ennemi){
 }
 
 function death_Zone_Spawnpoint(){
-    console.log("death")
-        //player.setPosition(1850, 1350);
+            player_hp = player_hp - 1;
+            if (player_hp<=0){
+                player_hp=0;
+                this.physics.pause();
+            }
             player.x=1850;
             player.y=1350;  
 }
 
-function death_Zone_Spawnpoint_2(){
-    console.log("death")
-        //player.setPosition(1850, 1350);
-            player.x=2700;
-            player.y=1000;  
+function death_Zone_Spawnpoint_2(player,hide_ennemi){
+            player_hp = player_hp - 1;
+            if (player_hp<=0){
+                player_hp=0;
+                this.physics.pause();
+            }   
+            console.log("pop");
+            Buta_normal=true;
+            Buta_Feu=false;
+            Buta_Glace=false;
+            Buta_Aile=false;
+            player.x=2925;
+            player.y=1100;  
+           // hide_ennemi.setVisible(true);
+
+            for(const hide_ennemi of this.Hide_EnnemiObjects){
+                this.hide_ennemis.create(hide_ennemi.x, hide_ennemi.y-50,'ennemi')
+                    .setScale(0.2)
+                    .setGravityY(300);
+            }
+        
+            for(const hide_ennemi of this.hide_ennemis.children.entries){
+                this.physics.add.collider(hide_ennemi, ground);
+                this.physics.add.collider(hide_ennemi, this.caisses);
+                this.physics.add.collider(player, hide_ennemi, Fonction_Hide_Ennemi, null, this);
+            }
 }
 /* function AnimRoulade(){
     console.log("11")
