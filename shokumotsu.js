@@ -19,9 +19,12 @@ create ()
     background = map.createDynamicLayer('Faux_Murs',tileset);
     this.death_zone = map.createDynamicLayer('Death_Zone',tileset);
     this.death_zone.setCollisionByExclusion(-1,true);
+    this.death_zone_2 = map.createDynamicLayer('Death_Zone_2',tileset);
+    this.death_zone_2.setCollisionByExclusion(-1,true);
 
    
-    player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
+    //player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
+    player = this.physics.add.sprite(2450,1100, 'sprite_buta_normal').setScale(0.06);
 
     full_heart_1 = this.add.sprite(50,30, 'full_heart').setScrollFactor(0).setScale(0.1);
     full_heart_2 = this.add.sprite(100,30, 'full_heart').setScrollFactor(0).setScale(0.1);
@@ -37,18 +40,19 @@ create ()
 
     jauge2 = this.add.sprite(100,75, 'sprite').setScale(0.4).setScrollFactor(0);
  /*    player = this.add.sprite(200,1550, 'sprite_buta').setScale(0.1); */
-    this.cameras.main.startFollow(player, false, 1, 1, 0, 150);
+    this.cameras.main.startFollow(player, false, 1, 1, 0, 0);
     
     player.setBounce(0.0);
     player.setCollideWorldBounds(false);
-
-    cursors = this.input.keyboard.createCursorKeys();    
+    
+    cursors = this.input.keyboard.createCursorKeys(); 
     Jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);  
     Competence_Speciale = this.input.keyboard.addKey('F');
     Roulade = this.input.keyboard.addKey('E');
 
     this.physics.add.collider(player, ground);
     this.physics.add.collider(player, this.death_zone, death_Zone_Spawnpoint, null, this);
+    this.physics.add.collider(player, this.death_zone_2, death_Zone_Spawnpoint_2, null, this);
 
 //CAISSE
     const CaisseObjects = map.getObjectLayer('Caisse').objects;
@@ -168,14 +172,14 @@ create ()
     }
     
 //RESPAWNING_POULET
-/*     const Respawn_PouletObjects = map.getObjectLayer('Respawn_Poulet').objects;
+    const Respawn_PouletObjects = map.getObjectLayer('Respawn_Poulet').objects;
 
         this.respawn_poulets = this.physics.add.group({
             immovable:true,
             allowGravity:false,
         });
 
-        for(const respawn_poulet of PouletObjects){
+        for(const respawn_poulet of Respawn_PouletObjects){
                 this.respawn_poulets.create(respawn_poulet.x, respawn_poulet.y, 'chicken')
                     .setScale(0.1)
         }
@@ -183,8 +187,43 @@ create ()
         for (const respawn_poulet of this.respawn_poulets.children.entries){
             this.physics.add.collider(respawn_poulet, ground);
             this.physics.add.overlap(player, respawn_poulet, Recolte_Respawn_Poulet, null, this);
-        } */
+        }
 
+//RESPAWNING_PIMENT
+const Respawn_PimentObjects = map.getObjectLayer('Respawn_Piment').objects;
+
+    this.respawn_piments = this.physics.add.group({
+        immovable:true,
+        allowGravity:false,
+    });
+
+    for(const respawn_piment of Respawn_PimentObjects){
+            this.respawn_piments.create(respawn_piment.x, respawn_piment.y, 'chilli_pepper')
+                .setScale(0.1)
+    }
+
+    for (const respawn_piment of this.respawn_piments.children.entries){
+        this.physics.add.collider(respawn_piment, ground);
+        this.physics.add.overlap(player, respawn_piment, Recolte_Respawn_Piment, null, this);
+    }
+
+//RESPAWNING_GLACE
+const Respawn_GlaceObjects = map.getObjectLayer('Respawn_Glace').objects;
+
+    this.respawn_glaces = this.physics.add.group({
+        immovable:true,
+        allowGravity:false,
+    });
+
+    for(const respawn_glace of Respawn_GlaceObjects){
+            this.respawn_glaces.create(respawn_glace.x, respawn_glace.y, 'ice_cream')
+                .setScale(0.07)
+    }
+
+    for (const respawn_glace of this.respawn_glaces.children.entries){
+        this.physics.add.collider(respawn_glace, ground);
+        this.physics.add.overlap(player, respawn_glace, Recolte_Respawn_Glace, null, this);
+    }
 
 //BOULE DE FEU
     boules_de_feu = this.physics.add.group({
@@ -811,10 +850,10 @@ update ()
                 }
 
                 if (ennemi.direction === 'RIGHT') {
-                    ennemi.setVelocityX(150);
+                    ennemi.setVelocityX(0);
                 } 
                 else if(ennemi.direction === 'LEFT') {
-                    ennemi.setVelocityX(-150);
+                    ennemi.setVelocityX(-0);
                 }  
             }
                     
@@ -985,7 +1024,7 @@ update ()
 //////FONCTIONS RECOLTES ELEMENTS//////
 ///////////////////////////////////////
 
-    function Recolte_Piment(player, piment)
+function Recolte_Piment(player, piment)
 {
     piment.destroy();
     Buta_normal=false;
@@ -1019,15 +1058,29 @@ function Recolte_Aliment(player,aliment)
     jauge += 10;
 }
 
-/* function Recolte_Respawn_Poulet(player,respawn_poulet)
+function Recolte_Respawn_Poulet(player,respawn_poulet)
 {
     Buta_normal=false;
     Buta_Aile=true;
     Buta_Feu=false;
     Buta_Glace=false;
     undefined_jauge=100;
-} */
+}
 
+function Recolte_Respawn_Glace(player, respawn_glace)
+{
+    Buta_normal=false;
+    Buta_Glace=true;
+    Buta_Feu=false;
+    Buta_Aile=false;
+}
+function Recolte_Respawn_Piment(player, respawn_piment)
+{
+    Buta_normal=false;
+    Buta_Feu=true;
+    Buta_Glace=false;
+    Buta_Aile=false;
+}
 
 ///////////////////////////////////////
 ////FIN FONCTIONS RECOLTES ELEMENTS////
@@ -1071,7 +1124,7 @@ function Gele_Ennemi(boules_de_glace,ennemi)
         ennemi.direction='Stop';
         movement=false;
         damageOff=true;
-        ennemi.anims.play('Freeze',false);
+        //ennemi.anims.play('Freeze',false);
         this.physics.add.collider(ennemi, ground);
         this.physics.add.collider(ennemi, caisses);
         this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [ennemi], this);
@@ -1081,7 +1134,7 @@ function Gele_Ennemi(boules_de_glace,ennemi)
 function endStopMovement(ennemi){ 
     ennemi.direction='RIGHT';
     damageOff=false;
-    ennemi.anims.play('buta_normal_left');
+    //ennemi.anims.play('buta_normal_left');
 }
 
 function death_Zone_Spawnpoint(){
@@ -1089,6 +1142,13 @@ function death_Zone_Spawnpoint(){
         //player.setPosition(1850, 1350);
             player.x=1850;
             player.y=1350;  
+}
+
+function death_Zone_Spawnpoint_2(){
+    console.log("death")
+        //player.setPosition(1850, 1350);
+            player.x=2700;
+            player.y=1000;  
 }
 /* function AnimRoulade(){
     console.log("11")

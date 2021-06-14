@@ -6,6 +6,7 @@ var cursors;
 var cursor_menu;
 var caisses
 var caisse;
+var choice=0;
 var box;
 var wallsLayer;
 var gameOver = false;
@@ -34,6 +35,7 @@ var image_menu = this.image_menu;
 var Buta_Feu;
 var piment;
 var piments;
+var respawn_chilli_pepper;
 var lancer_boule_de_feu;
 var boules_de_feu;
 var destroyFireball;
@@ -42,6 +44,7 @@ var BDF_reload = true;
 var Buta_Glace;
 var glace;
 var glaces;
+var respawn_icecream;
 var lancer_boule_de_glace;
 var boules_de_glace;
 var BDG_reload = true;
@@ -50,6 +53,7 @@ var timeoutResetSkill=1000;
 var Buta_Aile;
 var poulet;
 var poulets;
+var respawn_chicken;
 var flying_mode;
 var Aile_reload = true;
 var undefined_jauge=1000;
@@ -62,7 +66,7 @@ var jaugeText;
 var ennemi;
 var ennemis;
 var movement=true;
-var timeoutDelayMovementEnnemi=1000;
+var timeoutDelayMovementEnnemi=5000;
 var BDG_Touch=false;
 var onEnnemis=false;
 //HP
@@ -128,6 +132,8 @@ preload(){
 }
 
 create(){
+    cursors = this.input.keyboard.createCursorKeys(); 
+
     this.anims.create({
         key: 'buta_normal_right',
         frames: this.anims.generateFrameNumbers('sprite_buta_normal', {start: 5, end: 8}),
