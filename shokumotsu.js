@@ -312,7 +312,13 @@ const Respawn_GlaceObjects = map.getObjectLayer('Respawn_Glace').objects;
             frames: this.anims.generateFrameNumbers('sprite_buta_normal', {start: 4, end: 4}),
             frameRate: 10,
             repeat: -1
-    });    
+    });
+    this.anims.create({
+        key: 'buta_normal_static_gauche',
+        frames: this.anims.generateFrameNumbers('sprite_buta_normal', {start: 0, end: 0}),
+        frameRate: 10,
+        repeat: -1
+});    
     this.anims.create({
         key: 'buta_normal_left',
         frames: this.anims.generateFrameNumbers('sprite_buta_normal', {start: 0, end: 3}),
@@ -338,7 +344,13 @@ const Respawn_GlaceObjects = map.getObjectLayer('Respawn_Glace').objects;
             frames: this.anims.generateFrameNumbers('sprite_buta_feu', {start: 4, end: 4}),
             frameRate: 10,
             repeat: -1
-    });    
+    });  
+    this.anims.create({
+        key: 'buta_feu_static_gauche',
+        frames: this.anims.generateFrameNumbers('sprite_buta_feu', {start: 0, end: 0}),
+        frameRate: 10,
+        repeat: -1
+    });      
     this.anims.create({
             key: 'buta_feu_left',
             frames: this.anims.generateFrameNumbers('sprite_buta_feu', {start: 0, end: 3}),
@@ -370,7 +382,13 @@ const Respawn_GlaceObjects = map.getObjectLayer('Respawn_Glace').objects;
             frames: this.anims.generateFrameNumbers('sprite_buta_glace', {start: 4, end: 4}),
             frameRate: 10,
             repeat: -1
-    });    
+    });
+    this.anims.create({
+        key: 'buta_glace_static_gauche',
+        frames: this.anims.generateFrameNumbers('sprite_buta_glace', {start: 0, end: 0}),
+        frameRate: 10,
+        repeat: -1
+    });   
     this.anims.create({
             key: 'buta_glace_left',
             frames: this.anims.generateFrameNumbers('sprite_buta_glace', {start: 0, end: 3}),
@@ -402,7 +420,13 @@ const Respawn_GlaceObjects = map.getObjectLayer('Respawn_Glace').objects;
             frames: this.anims.generateFrameNumbers('sprite_buta_aile', {start: 4, end: 4}),
             frameRate: 10,
             repeat: -1
-    });    
+    });   
+    this.anims.create({
+        key: 'buta_aile_static_gauche',
+        frames: this.anims.generateFrameNumbers('sprite_buta_aile', {start: 0, end: 0}),
+        frameRate: 10,
+        repeat: -1
+    });  
     this.anims.create({
             key: 'buta_aile_left',
             frames: this.anims.generateFrameNumbers('sprite_buta_aile', {start: 0, end: 3}),
@@ -560,12 +584,19 @@ update ()
     //BUTA_NORMAL
     if(cursors.left.isDown && Roulade.isUp && Buta_normal == true){
             player.anims.play('buta_normal_left', true);
+            playerDirection='left';
         }
         if(cursors.right.isDown && Roulade.isUp && Buta_normal == true ){
             player.anims.play('buta_normal_right', true);
+            playerDirection='right';
         }
         if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_normal == true){
-            player.anims.play('buta_normal_static', true);
+            if(playerDirection=='right'){
+                player.anims.play('buta_normal_static', true);
+            }
+            if(playerDirection=='left'){
+                player.anims.play('buta_normal_static_gauche', true);
+            }
         }
         if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_normal == true|| cursors.right.isDown && onGround==false&& Buta_normal == true){
             player.anims.play('buta_normal_saut_droit', true);
@@ -576,12 +607,20 @@ update ()
     //BUTA_FEU
     if(cursors.left.isDown && Roulade.isUp && Buta_Feu == true){
             player.anims.play('buta_feu_left', true);
+            playerDirection='left';
         }
         if(cursors.right.isDown && Roulade.isUp && Buta_Feu == true){
             player.anims.play('buta_feu_right', true);
+            playerDirection='right';
         }
         if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_Feu == true){
-            player.anims.play('buta_feu_static', true);
+            if(playerDirection=='right'){
+                player.anims.play('buta_feu_static', true);
+            }
+            if(playerDirection=='left'){
+                player.anims.play('buta_feu_static_gauche', true);
+            }
+
         }
         if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_Feu == true|| cursors.right.isDown && onGround==false&& Buta_Feu == true){
             player.anims.play('buta_feu_saut_droit', true);
@@ -592,12 +631,19 @@ update ()
     //BUTA_GLACE
     if(cursors.left.isDown && Roulade.isUp && Buta_Glace == true){
             player.anims.play('buta_glace_left', true);
+            playerDirection='left';
         }
         if(cursors.right.isDown && Roulade.isUp && Buta_Glace == true ){
             player.anims.play('buta_glace_right', true);
+            playerDirection='right';
         }
         if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_Glace == true){
-            player.anims.play('buta_glace_static', true);
+            if(playerDirection=='right'){
+                player.anims.play('buta_glace_static', true);
+            }
+            if(playerDirection=='left'){
+                player.anims.play('buta_glace_static_gauche', true);
+            }
         }
         if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_Glace == true|| cursors.right.isDown && onGround==false&& Buta_Glace == true){
             player.anims.play('buta_glace_saut_droit', true);
@@ -608,12 +654,19 @@ update ()
     //BUTA_AILE
     if(cursors.left.isDown && Roulade.isUp && Buta_Aile == true){
             player.anims.play('buta_aile_left', true);
+            playerDirection='left';
         }
         if(cursors.right.isDown && Roulade.isUp && Buta_Aile == true ){
             player.anims.play('buta_aile_right', true);
+            playerDirection='right';
         }
         if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_Aile == true){
-            player.anims.play('buta_aile_static', true);
+            if(playerDirection=='right'){
+                player.anims.play('buta_aile_static', true);
+            }
+            if(playerDirection=='left'){
+                player.anims.play('buta_aile_static_gauche', true);
+            }
         }
         if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_Aile == true|| cursors.right.isDown && onGround==false&& Buta_Aile == true){
             player.anims.play('buta_aile_saut_droit', true);
@@ -632,7 +685,6 @@ update ()
     if (cursors.left.isDown && Roulade.isDown && jauge>0 && Buta_normal == true)
     {
         player.anims.play('buta_normal_roulade_gauche', true);
-        player.anims.play('buta_normal_roulade_gauche', false)
         player.anims.play('buta_normal_roulade_gauche_charge', true);
         roulade=true;
         player.setVelocityX(-500);
@@ -644,7 +696,6 @@ update ()
     if(cursors.right.isDown && Roulade.isDown && jauge>0 && Buta_normal == true)
     {
         player.anims.play('buta_normal_roulade_droite', true);
-        player.anims.play('buta_normal_roulade_droite', false);
         player.anims.play('buta_normal_roulade_droite_charge', true);
         roulade=true;
         player.setVelocityX(500);
@@ -659,7 +710,6 @@ update ()
     if (cursors.left.isDown && Roulade.isDown && jauge>0 && Buta_Feu == true)
     {
         player.anims.play('buta_feu_roulade_gauche', true);
-        player.anims.play('buta_feu_roulade_gauche', false);
         player.anims.play('buta_feu_roulade_gauche_charge', true);
         roulade=true;
         player.setVelocityX(-500);
@@ -671,7 +721,6 @@ update ()
     if(cursors.right.isDown && Roulade.isDown && jauge>0 && Buta_Feu == true)
     {
         player.anims.play('buta_feu_roulade_droite', true);
-        player.anims.play('buta_feu_roulade_droite', false);
         player.anims.play('buta_feu_roulade_droite_charge', true);
         roulade=true;
         player.setVelocityX(500);
@@ -685,7 +734,6 @@ update ()
     if (cursors.left.isDown && Roulade.isDown && jauge>0 && Buta_Glace == true)
     {
         player.anims.play('buta_glace_roulade_gauche', true);
-        player.anims.play('buta_glace_roulade_gauche', false);
         player.anims.play('buta_glace_roulade_gauche_charge', true);
         roulade=true;
         player.setVelocityX(-500);
@@ -697,7 +745,6 @@ update ()
     if(cursors.right.isDown && Roulade.isDown && jauge>0 && Buta_Glace == true)
     {
         player.anims.play('buta_glace_roulade_droite', true);
-        player.anims.play('buta_glace_roulade_droite', false);
         player.anims.play('buta_glace_roulade_droite_charge', true);
         roulade=true;
         player.setVelocityX(500);
@@ -711,7 +758,6 @@ update ()
     if (cursors.left.isDown && Roulade.isDown && jauge>0 && Buta_Aile == true)
     {
         player.anims.play('buta_aile_roulade_gauche', true);
-        player.anims.play('buta_aile_roulade_gauche', false);
         player.anims.play('buta_aile_roulade_gauche_charge', true);
         //this.time.delayedCall(1000, AnimRoulade, null, this);
         roulade=true;
@@ -724,7 +770,6 @@ update ()
     if(cursors.right.isDown && Roulade.isDown && jauge>0 && Buta_Aile == true)
     {
         player.anims.play('buta_aile_roulade_droite', true);
-        player.anims.play('buta_aile_roulade_droite', false);
         player.anims.play('buta_aile_roulade_droite_charge', true);
         roulade=true;
         player.setVelocityX(500);
