@@ -70,7 +70,7 @@
  "nextobjectid":21,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.4.2",
+ "tiledversion":"1.4.3",
  "tileheight":16,
  "tilesets":[
         {
@@ -82,7 +82,7 @@
          "margin":0,
          "name":"teste",
          "spacing":0,
-         "tilecount":1024,
+         "tilecount":1,
          "tileheight":16,
          "tiles":[
                 {

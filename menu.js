@@ -1,4 +1,6 @@
 var player;
+var contact=false;
+var animation;
 var Buta_normal=true;
 var playerBlockedDown = false;
 var inContactCaisse = false;
@@ -31,6 +33,7 @@ var Recolte_Poulet;
 var Fonction_Ennemi;
 var onGround;
 var image_menu = this.image_menu;
+var spawnpoint=0;
 //FEU
 var Buta_Feu;
 var piment;
@@ -70,6 +73,7 @@ var timeoutDelayMovementEnnemi=5000;
 var BDG_Touch=false;
 var onEnnemis=false;
 var bool_hide_ennemi=false;
+var epeiste_death=false;
 //HP
 var player_hp = 5;
 var invincible = false;
@@ -117,13 +121,16 @@ preload(){
     this.load.image('boule_de_glace_gauche','assets/boule_de_glace_gauche.png');
     this.load.image('chicken','assets/poulet.png');
     this.load.image('food','assets/aliment.png');
-    this.load.image('ennemi','assets/Perso_3.png');
+    //this.load.image('ennemi','assets/Perso_3.png');
     //this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
     this.load.tilemapTiledJSON('map','assets/tiles/Raion_Full.json');
     this.load.image('full_heart', 'assets/full_heart.png');
     this.load.image('empty_heart', 'assets/empty_heart.png');
     this.load.image('buta_menu', 'assets/Buta.png');
     this.load.spritesheet('ennemi_freeze','assets/BG_FX_glace.png', {frameWidth:500, frameHeight:500});
+    this.load.spritesheet('ennemi_bouclier','assets/BG_FX_Shield.png', {frameWidth:290, frameHeight:440});
+    this.load.spritesheet('ennemi_epeiste','assets/sprite_epeiste.png', {frameWidth:390, frameHeight:350});
+    this.load.spritesheet('ennemi_immobile_sensible_glace','assets/Perso_BG_3.png', {frameWidth:290, frameHeight:400});
     this.load.spritesheet('sprite', 'assets/spritesheet.png', { frameWidth:398, frameHeight:228});
     this.load.spritesheet('sprite_buta_normal', 'assets/sprite_buta_normal.png', { frameWidth:988, frameHeight:800});
     this.load.spritesheet('sprite_buta_feu', 'assets/sprite_buta_feu.png', { frameWidth:988, frameHeight:800});
