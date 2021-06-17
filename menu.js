@@ -1,4 +1,7 @@
 var player;
+var death_zone=false;
+var gel=0;
+var ejection=false;
 var contact=false;
 var animation;
 var Buta_normal=true;
@@ -15,7 +18,7 @@ var gameOver = false;
 var death;
 var ground;
 var Touche_Caisse=false;
-var playerDirection="right";
+var playerDirection="RIGHT";
 var destroyBox;
 var jumpCount=0;
 var doublesaut=true;
@@ -43,6 +46,7 @@ var lancer_boule_de_feu;
 var boules_de_feu;
 var destroyFireball;
 var BDF_reload = true;
+var count_bdf_masse = 0;
 //GLACE
 var Buta_Glace;
 var glace;
@@ -60,6 +64,7 @@ var respawn_chicken;
 var flying_mode;
 var Aile_reload = true;
 var undefined_jauge=1000;
+var competence=false;
 //ALIMENTS
 var aliment;
 var aliments;
@@ -107,12 +112,15 @@ class menu extends Phaser.Scene{
 preload(){
     this.load.image('menu', 'assets/Menu_Full_v2.png');
     this.load.image('jouer','assets/Jouer.png');
-    this.load.image('quitter', 'assets/Quitter.png');
+    this.load.image('quitter', 'assets/Quitter.png')
+    /* this.load.image('options', 'assets/Options.png');
+    this.load.image('controle', 'assets/controle.png'); */
     this.load.image('bg', 'assets/decor2.jpg');
     //this.load.image('bg_menu', 'assets/decor.jpg');
     this.load.image('tiles','assets/tiles/tiles.png');
     this.load.image('box','assets/box.png');
     this.load.image('bnormal','assets/buta.png');
+    this.load.image('gamelle','assets/full_heart.png');
     this.load.image('chilli_pepper','assets/piment.png');
     this.load.image('ice_cream','assets/glace.png');
     this.load.image('boule_de_feu_droit','assets/boule_de_feu_droit.png');
@@ -127,8 +135,9 @@ preload(){
     this.load.image('full_heart', 'assets/full_heart.png');
     this.load.image('empty_heart', 'assets/empty_heart.png');
     this.load.image('buta_menu', 'assets/Buta.png');
-    this.load.spritesheet('ennemi_freeze','assets/BG_FX_glace.png', {frameWidth:500, frameHeight:500});
+    this.load.spritesheet('ennemi_freeze','assets/BG_FX_glace.png', {frameWidth:400, frameHeight:590});
     this.load.spritesheet('ennemi_bouclier','assets/BG_FX_Shield.png', {frameWidth:290, frameHeight:440});
+    this.load.spritesheet('ennemi_masse','assets/sprite_ennemi_masse.png', {frameWidth:320, frameHeight:262});
     this.load.spritesheet('ennemi_epeiste','assets/sprite_epeiste.png', {frameWidth:390, frameHeight:350});
     this.load.spritesheet('ennemi_immobile_sensible_glace','assets/Perso_BG_3.png', {frameWidth:290, frameHeight:400});
     this.load.spritesheet('sprite', 'assets/spritesheet.png', { frameWidth:398, frameHeight:228});
@@ -152,9 +161,10 @@ create(){
     this.add.image(0, 0, 'menu').setOrigin(0).setScale(1);
     //this.add.image(300, 100, 'titre').setOrigin(0);
     
-    let playButton = this.add.image (400, 225, 'jouer').setOrigin(0.25,1).setScale(0.15);
-    let quitter = this.add.image (400, 225, 'quitter').setOrigin(0.25,-0.5).setScale(0.15);
+    let playButton = this.add.image (400, 225, 'jouer').setOrigin(0.25,1.25).setScale(0.15);
+    let quitter = this.add.image (400, 225, 'quitter').setOrigin(0.25,-1.25).setScale(0.15);
     let hoverSprite = this.add.sprite(0,0,"sprite_buta_normal").setScale(0.05).setVisible(false).setOrigin(-3,-1.7);
+    /* let options = this.add.image (400, 225, 'options').setOrigin(0.25,-0).setScale(0.15); */
 
 // PointerEvents:
 //   pointerover - hovering
@@ -164,11 +174,12 @@ create(){
 
     playButton.setInteractive();
     quitter.setInteractive();
+    options.setInteractive();
 
     playButton.on("pointerover", ()=>{  
         hoverSprite.setVisible(true);
         hoverSprite.x = playButton.x - playButton.width/6;
-        hoverSprite.y = playButton.y/2.2;
+        hoverSprite.y = playButton.y/3;
         hoverSprite.play("buta_normal_right");
     })
 
@@ -176,10 +187,21 @@ create(){
         hoverSprite.setVisible(false);
     })
 
+    /* options.on("pointerover", ()=>{  
+        hoverSprite.setVisible(true);
+        hoverSprite.x = playButton.x - playButton.width/6;
+        hoverSprite.y = options.y/1.25;
+        hoverSprite.play("buta_normal_right");
+    })
+
+    options.on("pointerout", ()=>{
+        hoverSprite.setVisible(false);
+    }) */
+
     quitter.on("pointerover", ()=>{
         hoverSprite.setVisible(true);
         hoverSprite.x = quitter.x - quitter.width/6;
-        hoverSprite.y = quitter.y;
+        hoverSprite.y = quitter.y/0.82;
         hoverSprite.play("buta_normal_right");
     })
 
@@ -194,5 +216,9 @@ create(){
     quitter.on("pointerdown", ()=>{
         game.destroy(true, false);
     })
+
+    /* options.on("pointerdown", ()=>{
+        this.scene.start("controle");
+    }) */
 }
 }

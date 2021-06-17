@@ -1,3 +1,11 @@
+//////////////////////////////////////
+//Corriger HitBox Gel               //
+//Changer fin de map                //
+//Faire une fin                     //
+//Ajout texte tutorial              //
+//Ajout Commande                    //
+//Image controle après Jouer        //
+//////////////////////////////////////
 class shokumotsu extends Phaser.Scene{
     constructor(){
         super("shokumotsu");
@@ -24,7 +32,8 @@ create ()
 
    
     player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
-    //player = this.physics.add.sprite(2450,1100, 'sprite_buta_normal').setScale(0.06);
+    //player = this.physics.add.sprite(2300,1100, 'sprite_buta_normal').setScale(0.06);
+    //player = this.physics.add.sprite(1400, 1500, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(800,1100, 'sprite_buta_normal').setScale(0.06);
 
     full_heart_1 = this.add.sprite(50,30, 'full_heart').setScrollFactor(0).setScale(0.1);
@@ -39,7 +48,7 @@ create ()
     empty_heart_4 = this.add.sprite(200,30, 'empty_heart').setVisible(false).setScrollFactor(0).setScale(0.1);
     empty_heart_5 = this.add.sprite(250,30, 'empty_heart').setVisible(false).setScrollFactor(0).setScale(0.1);
 
-    jauge2 = this.add.sprite(100,75, 'sprite').setScale(0.3).setScrollFactor(0);
+    jauge2 = this.add.sprite(105,75, 'sprite').setScale(0.4).setScrollFactor(0);
  /*    player = this.add.sprite(200,1550, 'sprite_buta').setScale(0.1); */
     this.cameras.main.startFollow(player, false, 1, 1, 0, 0);
     
@@ -150,6 +159,25 @@ create ()
         this.physics.add.overlap(player, aliment, Recolte_Aliment, null, this);
     }
 
+//GAMELLE 
+
+    const GamelleObjects = map.getObjectLayer('Gamelle').objects;
+
+    this.gamelles = this.physics.add.group({
+        immovable:true,
+        allowGravity:false,
+    });
+
+    for(const gamelle of GamelleObjects){
+        this.gamelles.create(gamelle.x, gamelle.y,'gamelle')
+            .setScale(0.1)
+    }
+
+    for(const gamelle of this.gamelles.children.entries){
+        this.physics.add.collider(gamelle,ground);
+        this.physics.add.overlap(player, gamelle, Recolte_Gamelle, null, this);
+    }
+
 //ENNEMIS 
 
     this.EnnemiObjects = map.getObjectLayer('Ennemi').objects;
@@ -185,8 +213,10 @@ create ()
 
     for(const hide_ennemi of this.Hide_EnnemiObjects){
         this.hide_ennemis.create(hide_ennemi.x, hide_ennemi.y-50,'ennemi_epeiste')
-            .setScale(0.2)
-            .setGravityY(300);
+            .setScale(0.25)
+            .setGravityY(300)
+            .setSize(200,275)
+            .setOffset(100,50);
     }
 
     for(const hide_ennemi of this.hide_ennemis.children.entries){
@@ -227,16 +257,41 @@ this.immobile_ennemis_sensible_glace = this.physics.add.group({
 });
 
 for(const immobile_ennemi_sensible_glace of this.Immobile_Ennemi_Sensible_GlaceObjects){
-    this.immobile_ennemis_sensible_glace.create(immobile_ennemi_sensible_glace.x, immobile_ennemi_sensible_glace.y-50,'ennemi_immobile_sensible_glace')
-        .setScale(0.2)
-        .setGravityY(300)
-        .setFlipX(true);
+    this.immobile_ennemis_sensible_glace.create(immobile_ennemi_sensible_glace.x, immobile_ennemi_sensible_glace.y-50,'ennemi_epeiste')
+    .setScale(0.25)
+    .setGravityY(300)
+    .setSize(200,275)
+    .setOffset(100,50);
 }
 
 for(const immobile_ennemi_sensible_glace of this.immobile_ennemis_sensible_glace.children.entries){
     this.physics.add.collider(immobile_ennemi_sensible_glace, ground);
     this.physics.add.collider(immobile_ennemi_sensible_glace, this.caisses);
     this.physics.add.collider(player, immobile_ennemi_sensible_glace, Fonction_Immobile_Ennemi, null, this);
+}
+
+//MASSE_ENNEMIS 
+
+this.Masse_EnnemiObjects = map.getObjectLayer('Masse_Ennemi').objects;
+
+this.masse_ennemis = this.physics.add.group({
+    immovable:false,
+    allowGravity:true,
+});
+
+for(const masse_ennemi of this.Masse_EnnemiObjects){
+    this.masse_ennemis.create(masse_ennemi.x, masse_ennemi.y-50,'ennemi_masse')
+        .setScale(0.25)
+        .setGravityY(300)
+        .setSize(200,275)
+        .setOffset(100,50);
+}
+
+for(const masse_ennemi of this.masse_ennemis.children.entries){
+    this.physics.add.collider(masse_ennemi, ground);
+    this.physics.add.collider(masse_ennemi, this.caisses);
+    this.physics.add.collider(player, masse_ennemi, Fonction_Ennemi_Masse, null, this);
+    masse_ennemi.direction = 'RIGHT';
 }
 
 //RESPAWNING_POULET
@@ -501,16 +556,16 @@ const Respawn_GlaceObjects = map.getObjectLayer('Respawn_Glace').objects;
     });
     this.anims.create({
             key: 'buta_aile_vole_droite',
-            frames: this.anims.generateFrameNumbers('sprite_buta_aile_vole', {start: 0, end: 0}),
+            frames: this.anims.generateFrameNumbers('sprite_buta_aile_vole', {start: 0, end: 2}),
             frameRate: 10,
             repeat: -1
     });
     this.anims.create({
             key: 'buta_aile_vole_gauche',
-            frames: this.anims.generateFrameNumbers('sprite_buta_aile_vole', {start: 5, end: 5}),
+            frames: this.anims.generateFrameNumbers('sprite_buta_aile_vole', {start: 3, end: 5}),
             frameRate: 10,
             repeat: -1
-    }); 
+    });
 
 //ROULADE
     this.anims.create({
@@ -656,6 +711,42 @@ const Respawn_GlaceObjects = map.getObjectLayer('Respawn_Glace').objects;
             frameRate: 10,
             repeat: -1
 }); 
+
+///////////
+///MASSE///
+/////////// 
+this.anims.create({
+    key: 'masse_move',
+    frames: this.anims.generateFrameNumbers('ennemi_masse', {start: 0, end: 3}),
+    frameRate: 5,
+    repeat: -1
+});
+this.anims.create({
+    key: 'masse_static',
+    frames: this.anims.generateFrameNumbers('ennemi_masse', {start: 0, end: 0}),
+    frameRate: 10,
+    repeat: -1
+});
+this.anims.create({
+    key: 'masse_attack',
+    frames: this.anims.generateFrameNumbers('ennemi_masse', {start: 4, end: 6}),
+    frameRate: 5,
+    repeat: -1
+});
+this.anims.create({
+    key: 'masse_death',
+    frames: this.anims.generateFrameNumbers('ennemi_masse', {start: 7, end: 8}),
+    frameRate: 5,
+    repeat: -1
+});  
+
+
+this.anims.create({
+    key: 'ennemi_shield',
+    frames: this.anims.generateFrameNumbers('ennemi_bouclier', {start: 0, end: 0}),
+    frameRate: 10,
+    repeat: -1
+}); 
 }
 
 //CONTROLE
@@ -666,112 +757,114 @@ update ()
     onGround = player.body.blocked.down;
     roulade=false;
     player.setGravityY(300);
-
+    if(cursors.right.isDown){
+        playerDirection='RIGHT'
+        }
+    if(cursors.left.isDown){
+            playerDirection='LEFT'
+        }
     //BUTA_NORMAL
-    if(cursors.left.isDown && Roulade.isUp && Buta_normal == true){
-            player.anims.play('buta_normal_left', true);
-            playerDirection='left';
-        }
-        if(cursors.right.isDown && Roulade.isUp && Buta_normal == true ){
-            player.anims.play('buta_normal_right', true);
-            playerDirection='right';
-        }
-        if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_normal == true){
-            if(playerDirection=='right'){
-                player.anims.play('buta_normal_static', true);
+    if(ejection==false){
+        if(cursors.left.isDown && Roulade.isUp && Buta_normal == true){
+                player.anims.play('buta_normal_right', true).setFlipX(true);
+                playerDirection='LEFT';
             }
-            if(playerDirection=='left'){
-                player.anims.play('buta_normal_static_gauche', true);
+            if(cursors.right.isDown && Roulade.isUp && Buta_normal == true ){
+                player.anims.play('buta_normal_right', true).setFlipX(false);
+                playerDirection='RIGHT';
             }
-        }
-        if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_normal == true|| cursors.right.isDown && onGround==false&& Buta_normal == true){
-            player.anims.play('buta_normal_saut_droit', true);
-        }
-        if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_normal == true|| cursors.left.isDown && onGround==false && Buta_normal == true){
-            player.anims.play('buta_normal_saut_gauche', true);
-        }
+            if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_normal == true){
+                if(playerDirection=='RIGHT'){
+                    player.anims.play('buta_normal_static', true).setFlipX(false);
+                }
+                if(playerDirection=='LEFT'){
+                    player.anims.play('buta_normal_static', true).setFlipX(true);
+                }
+            }
+            if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_normal == true|| cursors.right.isDown && onGround==false&& Buta_normal == true){
+                player.anims.play('buta_normal_saut_droit', true).setFlipX(false);
+            }
+            if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_normal == true|| cursors.left.isDown && onGround==false && Buta_normal == true){
+                player.anims.play('buta_normal_saut_droit', true).setFlipX(true);
+            }
     //BUTA_FEU
-    if(cursors.left.isDown && Roulade.isUp && Buta_Feu == true){
-            player.anims.play('buta_feu_left', true);
-            playerDirection='left';
-        }
-        if(cursors.right.isDown && Roulade.isUp && Buta_Feu == true){
-            player.anims.play('buta_feu_right', true);
-            playerDirection='right';
-        }
-        if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_Feu == true){
-            if(playerDirection=='right'){
-                player.anims.play('buta_feu_static', true);
+        if(cursors.left.isDown && Roulade.isUp && Buta_Feu == true){
+                player.anims.play('buta_feu_right', true).setFlipX(true);
+                playerDirection='LEFT';
             }
-            if(playerDirection=='left'){
-                player.anims.play('buta_feu_static_gauche', true);
+            if(cursors.right.isDown && Roulade.isUp && Buta_Feu == true){
+                player.anims.play('buta_feu_right', true).setFlipX(false);
+                playerDirection='RIGHT';
             }
+            if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_Feu == true){
+                if(playerDirection=='RIGHT'){
+                    player.anims.play('buta_feu_static', true).setFlipX(false);
+                }
+                if(playerDirection=='LEFT'){
+                    player.anims.play('buta_feu_static', true).setFlipX(true);
+                }
 
-        }
-        if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_Feu == true|| cursors.right.isDown && onGround==false&& Buta_Feu == true){
-            player.anims.play('buta_feu_saut_droit', true);
-        }
-        if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_Feu == true|| cursors.left.isDown && onGround==false && Buta_Feu == true){
-            player.anims.play('buta_feu_saut_gauche', true);
-        }
+            }
+            if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_Feu == true|| cursors.right.isDown && onGround==false&& Buta_Feu == true){
+                player.anims.play('buta_feu_saut_droit', true).setFlipX(false);
+            }
+            if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_Feu == true|| cursors.left.isDown && onGround==false && Buta_Feu == true){
+                player.anims.play('buta_feu_saut_gauche', true).setFlipX(true);
+            }
     //BUTA_GLACE
-    if(cursors.left.isDown && Roulade.isUp && Buta_Glace == true){
-            player.anims.play('buta_glace_left', true);
-            playerDirection='left';
-        }
-        if(cursors.right.isDown && Roulade.isUp && Buta_Glace == true ){
-            player.anims.play('buta_glace_right', true);
-            playerDirection='right';
-        }
-        if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_Glace == true){
-            if(playerDirection=='right'){
-                player.anims.play('buta_glace_static', true);
+        if(cursors.left.isDown && Roulade.isUp && Buta_Glace == true){
+            player.anims.play('buta_glace_right', true).setFlipX(true);
+                playerDirection='LEFT';
             }
-            if(playerDirection=='left'){
-                player.anims.play('buta_glace_static_gauche', true);
+            if(cursors.right.isDown && Roulade.isUp && Buta_Glace == true ){
+                player.anims.play('buta_glace_right', true).setFlipX(false);
+                playerDirection='RIGHT';
             }
-        }
-        if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_Glace == true|| cursors.right.isDown && onGround==false&& Buta_Glace == true){
-            player.anims.play('buta_glace_saut_droit', true);
-        }
-        if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_Glace == true|| cursors.left.isDown && onGround==false && Buta_Glace == true){
-            player.anims.play('buta_glace_saut_gauche', true);
-        }
+            if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_Glace == true){
+                if(playerDirection=='RIGHT'){
+                    player.anims.play('buta_glace_static', true).setFlipX(false);
+                }
+                if(playerDirection=='LEFT'){
+                    player.anims.play('buta_glace_static', true).setFlipX(true);
+                }
+            }
+            if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_Glace == true|| cursors.right.isDown && onGround==false&& Buta_Glace == true){
+                player.anims.play('buta_glace_saut_droit', true).setFlipX(false);
+            }
+            if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_Glace == true|| cursors.left.isDown && onGround==false && Buta_Glace == true){
+                player.anims.play('buta_glace_saut_droit', true).setFlipX(true);
+            }
     //BUTA_AILE
-    if(cursors.left.isDown && Roulade.isUp && Buta_Aile == true){
-            player.anims.play('buta_aile_left', true);
-            playerDirection='left';
-        }
-        if(cursors.right.isDown && Roulade.isUp && Buta_Aile == true ){
-            player.anims.play('buta_aile_right', true);
-            playerDirection='right';
-        }
-        if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_Aile == true){
-            if(playerDirection=='right'){
-                player.anims.play('buta_aile_static', true);
+            if(cursors.left.isDown && cursors.up.isUp && Roulade.isUp && Buta_Aile == true && onGround==true){
+                player.anims.play('buta_aile_right', true).setFlipX(true);
+                playerDirection='LEFT';
             }
-            if(playerDirection=='left'){
-                player.anims.play('buta_aile_static_gauche', true);
+            if(cursors.right.isDown && cursors.up.isUp && Roulade.isUp && Buta_Aile == true && onGround==true ){
+                player.anims.play('buta_aile_right', true).setFlipX(false);
+                playerDirection='RIGHT';
             }
-        }
-        if(cursors.right.isDown && Roulade.isUp && cursors.up.isDown && Buta_Aile == true|| cursors.right.isDown && onGround==false&& Buta_Aile == true){
-            player.anims.play('buta_aile_saut_droit', true);
-        }
-        if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_Aile == true|| cursors.left.isDown && onGround==false && Buta_Aile == true){
-            player.anims.play('buta_aile_saut_gauche', true);
-        }
-        if(cursors.right.isDown && Buta_Aile == true && Competence_Speciale.isDown || cursors.right.isDown && cursors.up.isDown && Buta_Aile == true && Competence_Speciale.isDown){
-            player.anims.play('buta_aile_vole_droite', true);
-        }
-        if(cursors.left.isDown && Buta_Aile == true && Competence_Speciale.isDown|| cursors.left.isDown && cursors.up.isDown && Buta_Aile == true && Competence_Speciale.isDown){
-            player.anims.play('buta_aile_vole_gauche', true);
-        }
-
+            if(cursors.right.isUp && Roulade.isUp && cursors.left.isUp && Buta_Aile == true && onGround==true){
+                if(playerDirection=='RIGHT'){
+                    player.anims.play('buta_aile_static', true).setFlipX(false);
+                }
+                if(playerDirection=='LEFT'){
+                    player.anims.play('buta_aile_static', true).setFlipX(true);
+                }
+            }
+            if(Buta_Aile == true && onGround == false){
+                if(playerDirection=='RIGHT'){
+                    player.anims.play('buta_aile_vole_droite', true).setFlipX(false);
+                    console.log("Droite")
+                }   
+                if(playerDirection=='LEFT'){
+                    player.anims.play('buta_aile_vole_droite', true).setFlipX(true);
+                    console.log("gauche")
+                }
+            }
     //ROULADE BUTA NORMAL
     if (cursors.left.isDown && Roulade.isDown && jauge>0 && Buta_normal == true)
     {
-        player.anims.play('buta_normal_roulade_gauche', true);
-        player.anims.play('buta_normal_roulade_gauche_charge', true);
+        player.anims.play('buta_normal_roulade_droite_charge', true).setFlipX(true);
         roulade=true;
         player.setVelocityX(-500);
         jauge-=1;
@@ -781,8 +874,7 @@ update ()
     }
     if(cursors.right.isDown && Roulade.isDown && jauge>0 && Buta_normal == true)
     {
-        player.anims.play('buta_normal_roulade_droite', true);
-        player.anims.play('buta_normal_roulade_droite_charge', true);
+        player.anims.play('buta_normal_roulade_droite_charge', true).setFlipX(false);
         roulade=true;
         player.setVelocityX(500);
         jauge-=1;
@@ -795,8 +887,7 @@ update ()
 
     if (cursors.left.isDown && Roulade.isDown && jauge>0 && Buta_Feu == true)
     {
-        player.anims.play('buta_feu_roulade_gauche', true);
-        player.anims.play('buta_feu_roulade_gauche_charge', true);
+        player.anims.play('buta_feu_roulade_droite_charge', true).setFlipX(true);
         roulade=true;
         player.setVelocityX(-500);
         jauge-=1;
@@ -806,8 +897,7 @@ update ()
     }
     if(cursors.right.isDown && Roulade.isDown && jauge>0 && Buta_Feu == true)
     {
-        player.anims.play('buta_feu_roulade_droite', true);
-        player.anims.play('buta_feu_roulade_droite_charge', true);
+        player.anims.play('buta_feu_roulade_droite_charge', true).setFlipX(false);
         roulade=true;
         player.setVelocityX(500);
         jauge-=1;
@@ -819,8 +909,7 @@ update ()
 
     if (cursors.left.isDown && Roulade.isDown && jauge>0 && Buta_Glace == true)
     {
-        player.anims.play('buta_glace_roulade_gauche', true);
-        player.anims.play('buta_glace_roulade_gauche_charge', true);
+        player.anims.play('buta_glace_roulade_droite_charge', true).setFlipX(true);
         roulade=true;
         player.setVelocityX(-500);
         jauge-=1;
@@ -830,8 +919,7 @@ update ()
     }
     if(cursors.right.isDown && Roulade.isDown && jauge>0 && Buta_Glace == true)
     {
-        player.anims.play('buta_glace_roulade_droite', true);
-        player.anims.play('buta_glace_roulade_droite_charge', true);
+        player.anims.play('buta_glace_roulade_droite_charge', true).setFlipX(false);
         roulade=true;
         player.setVelocityX(500);
         jauge-=1;
@@ -843,8 +931,7 @@ update ()
 
     if (cursors.left.isDown && Roulade.isDown && jauge>0 && Buta_Aile == true)
     {
-        player.anims.play('buta_aile_roulade_gauche', true);
-        player.anims.play('buta_aile_roulade_gauche_charge', true);
+        player.anims.play('buta_aile_roulade_droite_charge', true).setFlipX(true);
         roulade=true;
         player.setVelocityX(-500);
         jauge-=1;
@@ -854,8 +941,7 @@ update ()
     }
     if(cursors.right.isDown && Roulade.isDown && jauge>0 && Buta_Aile == true)
     {
-        player.anims.play('buta_aile_roulade_droite', true);
-        player.anims.play('buta_aile_roulade_droite_charge', true);
+        player.anims.play('buta_aile_roulade_droite_charge', true).setFlipX(false);
         roulade=true;
         player.setVelocityX(500);
         jauge-=1;
@@ -915,6 +1001,7 @@ update ()
             lancer_boule_de_feu(player);
             this.physics.add.collider(boules_de_feu, ground, destroyFireball, null, this);
             this.physics.add.overlap(boules_de_feu, this.ennemis, Kill_Ennemi, null, this);
+            this.physics.add.overlap(boules_de_feu, this.masse_ennemis, Kill_Masse_Ennemi, null, this);
             this.physics.add.overlap(boules_de_feu, this.hide_ennemis, Hide_Ennemi, null, this);
             this.physics.add.overlap(boules_de_feu, this.immobile_ennemis, Kill_Ennemi, null, this);
             this.physics.add.overlap(boules_de_feu, this.immobile_ennemis_sensible_glace, Kill_Ennemi, null, this);
@@ -937,6 +1024,7 @@ update ()
     {
         if(Buta_Aile==true && undefined_jauge>0)
         {
+            competence=true;
             player.setGravity(0);
             if(cursors.down.isDown)
             {
@@ -950,7 +1038,19 @@ update ()
             }
         }       
     }
-    if (player_hp == 4){
+    if(player_hp==5){
+                full_heart_5.setVisible(true);
+                empty_heart_5.setVisible(false);
+                full_heart_4.setVisible(true);
+                empty_heart_4.setVisible(false);
+                full_heart_3.setVisible(true);
+                empty_heart_3.setVisible(false);
+                full_heart_2.setVisible(true);
+                empty_heart_2.setVisible(false);
+                full_heart_1.setVisible(true);
+                empty_heart_1.setVisible(false);
+            }
+            else if (player_hp == 4){
                 full_heart_5.setVisible(false);
                 empty_heart_5.setVisible(true);
             }
@@ -997,15 +1097,25 @@ update ()
                 
             }
             else if(ennemi.direction!=='Stop' && contact!=true && epeiste_death!==true){
-                if (ennemi.body.blocked.right || ennemi.body.touching.right) {
+                if (player.x - ennemi.x < 0) {
                     ennemi.direction = 'LEFT';
-                    ennemi.anims.play("epeiste_move", true).setScale(0.25).setFlipX(false);
+                    ennemi.anims.play("epeiste_move", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(200,275)
+                    .setOffset(100,50)
+                    .setFlipX(false);
                     
                 }
 
-                if (ennemi.body.blocked.left || ennemi.body.touching.left) {
+                if (player.x - ennemi.x > 0) {
                     ennemi.direction = 'RIGHT';
-                    ennemi.anims.play("epeiste_move", true).setScale(0.25).setFlipX(true);
+                    ennemi.anims.play("epeiste_move", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(200,275)
+                    .setOffset(100,50)
+                    .setFlipX(true);
                 }
 
                 if (ennemi.direction === 'RIGHT') {
@@ -1016,13 +1126,72 @@ update ()
                 }  
             }
                     
-        }   
+        }
+        
+        for (const hide_ennemi of this.hide_ennemis.children.entries) {
+            if(hide_ennemi.direction=='Stop'){
+                hide_ennemi.setVelocityX(0);
+                
+            }
+            else if(hide_ennemi.direction!=='Stop' && contact!=true && epeiste_death!==true){
+                if (player.x - hide_ennemi.x < 0) {
+                    hide_ennemi.direction = 'LEFT';
+                    hide_ennemi.anims.play("epeiste_static", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(200,275)
+                    .setOffset(100,50)
+                    .setFlipX(false);
+                    
+                }
+
+                if (player.x - hide_ennemi.x > 0) {
+                    hide_ennemi.direction = 'RIGHT';
+                    hide_ennemi.anims.play("epeiste_static", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(200,275)
+                    .setOffset(100,50)
+                    .setFlipX(true);
+                }
+            }
+                    
+        }
+
+        for (const masse_ennemi of this.masse_ennemis.children.entries) {
+            if(masse_ennemi.direction=='Stop'){
+                masse_ennemi.setVelocityX(0);
+                
+            }
+            else if(masse_ennemi.direction!=='Stop' && contact!=true && epeiste_death!==true){
+                if (player.x - masse_ennemi.x < 0) {
+                    masse_ennemi.direction = 'LEFT';
+                    masse_ennemi.anims.play("masse_static", true)
+                    .setScale(0.3)
+                    .setGravityY(300)
+                    .setSize(200,275)
+                    .setOffset(50,0)
+                    .setFlipX(false); 
+                }
+
+                if (player.x - masse_ennemi.x > 0) {
+                    masse_ennemi.direction = 'RIGHT';
+                    masse_ennemi.anims.play("masse_static", true)
+                    .setScale(0.3)
+                    .setGravityY(300)
+                    .setSize(200,275)
+                    .setOffset(50,0)
+                    .setFlipX(true);
+                }
+            }
+                    
+        }
 
         if(doublesaut===true)
         {
         const isJumpJustDownup = Phaser.Input.Keyboard.JustDown(cursors.up)         
         //DOUBLE SAUT SI HAUT DE CAISSE
-        if (isJumpJustDownup && (onGround || jumpCount < 2 || onEnnemis==true && jumpCount < 2)) 
+        if (isJumpJustDownup && (onGround || jumpCount < 2 || onEnnemis==true && jumpCount < 2 || inContactCaisse==true && jumpCount < 2)) 
         {
             player.setVelocityY(-170);
             jumpCount++;
@@ -1067,6 +1236,7 @@ update ()
         }
 }
 }
+}
 ///////////////////////////////////////
 ///////FONCTIONS SPECIALS SKILLS///////
 ///////////////////////////////////////
@@ -1082,11 +1252,11 @@ update ()
 
         if(cursors.left.isDown){
             directionFireballPlayer=-400;
-            playerDirection="left";
+            playerDirection='LEFT';
         }
         else if(cursors.right.isDown){
             directionFireballPlayer=400;
-            playerDirection="right";
+            playerDirection='RIGHT';
         }
         else if(cursors.right.isUp && cursors.left.isUp && cursors.up.isUp && directionFireballPlayer==1){
             directionFireballPlayer=400;
@@ -1095,12 +1265,12 @@ update ()
             directionFireballPlayer=-400;
         }
 
-        if(playerDirection=="right"){
+        if(playerDirection=='RIGHT'){
             boule_de_feu_gauche.destroy();
             boule_de_feu_droit.setVelocity(400, 0);   
         }
 
-        else if(playerDirection=="left"){
+        else if(playerDirection=='LEFT'){
             boule_de_feu_droit.destroy();
             boule_de_feu_gauche.setVelocity(-400, 0);
         }  
@@ -1120,12 +1290,12 @@ update ()
         
         if(cursors.left.isDown){
             directionIceBallPlayer=-400;
-            playerDirection="left";
+            playerDirection='LEFT';
             
         }
         else if(cursors.right.isDown){
             directionIceBallPlayer=400;
-            playerDirection="right";
+            playerDirection='RIGHT';
             
         }
         else if(cursors.right.isUp && cursors.left.isUp && cursors.up.isUp && directionIceBallPlayer==1){
@@ -1135,12 +1305,12 @@ update ()
             directionIceBallPlayer=-400;
         }
 
-        if(playerDirection=="right"){
+        if(playerDirection=='RIGHT'){
             boule_de_glace_gauche.destroy();
             boule_de_glace_droit.setVelocity(400, 0);
         }
 
-        else if(playerDirection=="left"){
+        else if(playerDirection=='LEFT'){
             boule_de_glace_droit.destroy();
             boule_de_glace_gauche.setVelocity(-400, 0);
         }
@@ -1217,7 +1387,13 @@ function Recolte_Aliment(player,aliment)
     jauge += 10;
 }
 
-function Recolte_Respawn_Poulet(player,respawn_poulet)
+function Recolte_Gamelle(player,gamelle)
+{
+    gamelle.destroy();
+    player_hp=5;
+}
+
+function Recolte_Respawn_Poulet(player,t_poulet)
 {
     Buta_normal=false;
     Buta_Aile=true;
@@ -1250,9 +1426,14 @@ function Fonction_Ennemi(player,ennemi)
     if(ennemi.direction!=='Stop')
     {
     contact=true;
-    ennemi.anims.play("epeiste_attack", true).setScale(0.25);
+    if(player.x - ennemi.x > 0){
+        ennemi.anims.play("epeiste_attack", true).setScale(0.25).setFlipX(true);
+    }
+    else if(player.x - ennemi.x < 0){
+        ennemi.anims.play("epeiste_attack", true).setScale(0.25).setFlipX(false);
     }
     setTimeout(function(){contact = false}, 500);
+    }
     if(ennemi.direction=='Stop')
     {
         doublesaut=true;
@@ -1267,7 +1448,43 @@ function Fonction_Ennemi(player,ennemi)
             player_hp=0;
             this.physics.pause();
         }   
-        setTimeout(function(){invincible = false}, 1000);
+        setTimeout(function(){invincible = false}, 650);
+    }
+}
+
+function Fonction_Ennemi_Masse(player,masse_ennemi)
+{
+    if(masse_ennemi.direction!=='Stop')
+    {
+    contact=true;
+    ejection=true;
+        if(player.x - masse_ennemi.x > 0 && ejection==true){
+                masse_ennemi.anims.play("masse_attack", true).setScale(0.25).setFlipX(true);
+                player.setVelocityX(500);
+                setTimeout(function(){ejection = false}, 500);
+            }
+        else if(player.x - masse_ennemi.x < 0 && ejection==true){
+                masse_ennemi.anims.play("masse_attack", true).setScale(0.25).setFlipX(false);
+                player.setVelocityX(-500);
+                setTimeout(function(){ejection = false}, 500);
+            }
+    }
+    setTimeout(function(){contact = false}, 500);
+    if(masse_ennemi.direction=='Stop')
+    {
+        doublesaut=true;
+        onEnnemis=true;
+        jumpCount=0;
+        contact=false;
+    }
+    else if (invincible == false){
+        player_hp = player_hp - 1;
+        invincible = true;
+        if (player_hp<=0){
+            player_hp=0;
+            this.physics.pause();
+        }   
+        setTimeout(function(){invincible = false}, 650);
     }
 }
 
@@ -1285,7 +1502,7 @@ function Fonction_Hide_Ennemi(player, hide_ennemi){
             player_hp=0;
             this.physics.pause();
         }   
-        setTimeout(function(){invincible = false}, 1000);
+        setTimeout(function(){invincible = false}, 650);
     }
 }
 
@@ -1303,7 +1520,7 @@ function Fonction_Immobile_Ennemi(player, immobile_ennemi){
             player_hp=0;
             this.physics.pause();
         }   
-        setTimeout(function(){invincible = false}, 1000);
+        setTimeout(function(){invincible = false}, 650);
     }
 }
 
@@ -1314,12 +1531,27 @@ function Kill_Ennemi(boules_de_feu,ennemi)
     boules_de_feu.destroy();
     BDF_reload=true;
     setTimeout(function(){ennemi.destroy();}, 250);
+    setTimeout(function(){epeiste_death=false;}, 250);
+}
+
+function Kill_Masse_Ennemi(boules_de_feu,masse_ennemi)
+{
+    boules_de_feu.destroy();
+    count_bdf_masse+=1
+    BDF_reload=true;
+    if(count_bdf_masse==2){
+        epeiste_death=true;
+        masse_ennemi.anims.play("masse_death", true);
+        
+        setTimeout(function(){masse_ennemi.destroy();}, 250);
+        setTimeout(function(){epeiste_death=false;}, 250);
+    }
 }
 
 function Hide_Ennemi(boules_de_feu,hide_ennemi)
 {
     for(const hide_ennemi of this.hide_ennemis.children.entries){
-    hide_ennemi.destroy()
+        hide_ennemi.destroy()
     }
     boules_de_feu.destroy();
     BDF_reload=true;
@@ -1335,17 +1567,51 @@ function Gele_Ennemi(boules_de_glace,ennemi)
         ennemi.direction='Stop';
         movement=false;
         damageOff=true;
-        ennemi.anims.play('Freeze',false);
+        ennemi.anims.play('Freeze',true)
+        .setScale(0.15)
+        .setSize(300,550)
+        .setOffset(50,-100);
         this.physics.add.collider(ennemi, ground);
         this.physics.add.collider(ennemi, caisses);
         this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [ennemi], this);
     }
 }
 
+function Gele_Ennemi(boules_de_glace,hide_ennemi)
+{
+    boules_de_glace.destroy();
+    BDG_reload=true;
+    BDG_Touch=true;
+    gel=1;  
+    if(hide_ennemi.movement!== 'Stop' && BDG_Touch==true){
+        hide_ennemi.direction='Stop';
+        movement=false;
+        damageOff=true;
+        hide_ennemi.anims.play('Freeze',true)
+        .setScale(0.15)
+        .setSize(300,550)
+        .setOffset(50,-100);
+        this.physics.add.collider(hide_ennemi, ground);
+        this.physics.add.collider(hide_ennemi, caisses);
+        this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [hide_ennemi], this);
+
+    
+    }
+}
+
 function endStopMovement(ennemi){ 
     ennemi.direction='RIGHT';
     damageOff=false;
-    ennemi.anims.play('ennemi');
+}
+
+function endStopMovement(hide_ennemi){ 
+    if(gel==1 && death_zone==true){
+        hide_ennemi.destroy();
+        gel=0;
+        death_zone=false;
+    }
+    hide_ennemi.direction='RIGHT';
+    damageOff=false;
 }
 
 function death_Zone_Spawnpoint(){
@@ -1359,6 +1625,7 @@ function death_Zone_Spawnpoint(){
 }
 
 function death_Zone_Spawnpoint_2(player,hide_ennemi){
+            death_zone=true;
             player_hp = player_hp - 1;
             if (player_hp<=0){
                 player_hp=0;
@@ -1373,9 +1640,11 @@ function death_Zone_Spawnpoint_2(player,hide_ennemi){
             player.y=1100;  
 
             for(const hide_ennemi of this.Hide_EnnemiObjects){
-                this.hide_ennemis.create(hide_ennemi.x, hide_ennemi.y-50,'ennemi')
-                    .setScale(0.2)
-                    .setGravityY(300);
+                this.hide_ennemis.create(hide_ennemi.x, hide_ennemi.y-50,'ennemi_epeiste')
+                .setScale(0.25)
+                .setGravityY(300)
+                .setSize(200,275)
+                .setOffset(100,50);
             }
         
             for(const hide_ennemi of this.hide_ennemis.children.entries){
