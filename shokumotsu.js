@@ -1,10 +1,9 @@
 //////////////////////////////////////
-//Corriger HitBox Gel               //
 //Changer fin de map                //
 //Faire une fin                     //
-//Ajout texte tutorial              //
-//Ajout Commande                    //
-//Image controle après Jouer        //
+//Faire les tirs des ennemis        //
+//Intégrer les deux ennemis restants//
+//SONS                              //
 //////////////////////////////////////
 class shokumotsu extends Phaser.Scene{
     constructor(){
@@ -15,6 +14,7 @@ class shokumotsu extends Phaser.Scene{
 
 create ()
 {  
+    this.cameras.main.fadeIn(1000);
     this.add.image(-500, 0, 'bg').setOrigin(0,-1.08).setScale(0.7);
     this.add.image(903.5,0, 'bg').setOrigin(0,-1.08).setScale(0.7);
     this.add.image(2303.5,0, 'bg').setOrigin(0,-1.08).setScale(0.7);
@@ -50,6 +50,7 @@ create ()
 
     jauge2 = this.add.sprite(105,75, 'sprite').setScale(0.4).setScrollFactor(0);
  /*    player = this.add.sprite(200,1550, 'sprite_buta').setScale(0.1); */
+    this.cameras.main.setBounds(0, 0, 2950,1700);
     this.cameras.main.startFollow(player, false, 1, 1, 0, 0);
     
     player.setBounce(0.0);
@@ -809,7 +810,7 @@ update ()
                 player.anims.play('buta_feu_saut_droit', true).setFlipX(false);
             }
             if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_Feu == true|| cursors.left.isDown && onGround==false && Buta_Feu == true){
-                player.anims.play('buta_feu_saut_gauche', true).setFlipX(true);
+                player.anims.play('buta_feu_saut_droit', true).setFlipX(true);
             }
     //BUTA_GLACE
         if(cursors.left.isDown && Roulade.isUp && Buta_Glace == true){
@@ -1569,8 +1570,8 @@ function Gele_Ennemi(boules_de_glace,ennemi)
         damageOff=true;
         ennemi.anims.play('Freeze',true)
         .setScale(0.15)
-        .setSize(300,550)
-        .setOffset(50,-100);
+        .setSize(300,450)
+        .setOffset(50,-40);
         this.physics.add.collider(ennemi, ground);
         this.physics.add.collider(ennemi, caisses);
         this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [ennemi], this);
@@ -1589,8 +1590,8 @@ function Gele_Ennemi(boules_de_glace,hide_ennemi)
         damageOff=true;
         hide_ennemi.anims.play('Freeze',true)
         .setScale(0.15)
-        .setSize(300,550)
-        .setOffset(50,-100);
+        .setSize(300,450)
+        .setOffset(50,-40);
         this.physics.add.collider(hide_ennemi, ground);
         this.physics.add.collider(hide_ennemi, caisses);
         this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [hide_ennemi], this);

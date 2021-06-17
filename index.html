@@ -5,6 +5,7 @@
     <title>Mario like Inchallah j'y arrive</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <script src="menu.js"></script>
+    <script src="affichage_ctrl.js"></script>
     <script src="shokumotsu.js"></script>
     <style type="text/css">
         body {
@@ -27,7 +28,7 @@ var config = {
             debug:true,
         }
     },
-    scene: [menu, shokumotsu]
+    scene: [menu,affichage_ctrl, shokumotsu]
 };
 
     var game = new Phaser.Game(config);

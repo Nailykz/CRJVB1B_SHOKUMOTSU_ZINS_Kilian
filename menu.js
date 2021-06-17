@@ -112,9 +112,11 @@ class menu extends Phaser.Scene{
 preload(){
     this.load.image('menu', 'assets/Menu_Full_v2.png');
     this.load.image('jouer','assets/Jouer.png');
-    this.load.image('quitter', 'assets/Quitter.png')
-    /* this.load.image('options', 'assets/Options.png');
-    this.load.image('controle', 'assets/controle.png'); */
+    this.load.image('quitter', 'assets/Quitter.png');
+    this.load.image('Menu_controle', 'assets/Menu_controle.png');
+    this.load.image('Menu_controle_test', 'assets/Menu_controle_test.png');
+    this.load.image('skip_repas_false', 'assets/skip_repas_false.png');
+    this.load.image('skip_repas_true', 'assets/skip_repas_true.png');
     this.load.image('bg', 'assets/decor2.jpg');
     //this.load.image('bg_menu', 'assets/decor.jpg');
     this.load.image('tiles','assets/tiles/tiles.png');
@@ -149,6 +151,7 @@ preload(){
 }
 
 create(){
+    
     cursors = this.input.keyboard.createCursorKeys(); 
 
     this.anims.create({
@@ -159,12 +162,10 @@ create(){
 }); 
 
     this.add.image(0, 0, 'menu').setOrigin(0).setScale(1);
-    //this.add.image(300, 100, 'titre').setOrigin(0);
     
     let playButton = this.add.image (400, 225, 'jouer').setOrigin(0.25,1.25).setScale(0.15);
-    let quitter = this.add.image (400, 225, 'quitter').setOrigin(0.25,-1.25).setScale(0.15);
+    let quitter = this.add.image (400, 225, 'quitter').setOrigin(0.25,-0.5).setScale(0.15);
     let hoverSprite = this.add.sprite(0,0,"sprite_buta_normal").setScale(0.05).setVisible(false).setOrigin(-3,-1.7);
-    /* let options = this.add.image (400, 225, 'options').setOrigin(0.25,-0).setScale(0.15); */
 
 // PointerEvents:
 //   pointerover - hovering
@@ -174,7 +175,6 @@ create(){
 
     playButton.setInteractive();
     quitter.setInteractive();
-    options.setInteractive();
 
     playButton.on("pointerover", ()=>{  
         hoverSprite.setVisible(true);
@@ -187,21 +187,10 @@ create(){
         hoverSprite.setVisible(false);
     })
 
-    /* options.on("pointerover", ()=>{  
-        hoverSprite.setVisible(true);
-        hoverSprite.x = playButton.x - playButton.width/6;
-        hoverSprite.y = options.y/1.25;
-        hoverSprite.play("buta_normal_right");
-    })
-
-    options.on("pointerout", ()=>{
-        hoverSprite.setVisible(false);
-    }) */
-
     quitter.on("pointerover", ()=>{
         hoverSprite.setVisible(true);
         hoverSprite.x = quitter.x - quitter.width/6;
-        hoverSprite.y = quitter.y/0.82;
+        hoverSprite.y = quitter.y/1.05;
         hoverSprite.play("buta_normal_right");
     })
 
@@ -210,15 +199,14 @@ create(){
     })
 
     playButton.on("pointerdown", ()=>{
-        this.scene.start("shokumotsu");
+        this.scene.start("affichage_ctrl");
+        this.cameras.main.once('camerafadeincomplete', function (camera) {
+            camera.fadeOut(1000);
+        })
     })
 
     quitter.on("pointerdown", ()=>{
         game.destroy(true, false);
     })
-
-    /* options.on("pointerdown", ()=>{
-        this.scene.start("controle");
-    }) */
 }
 }
