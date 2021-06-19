@@ -1,10 +1,9 @@
-class controle extends Phaser.Scene{
+class defaite extends Phaser.Scene{
     constructor(){
-        super("controle");
+        super("defaite");
     }
     init(data){
     }
-
     create(){
 
     }

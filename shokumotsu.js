@@ -1,10 +1,9 @@
 //////////////////////////////////////
-//Corriger HitBox Gel               //
 //Changer fin de map                //
 //Faire une fin                     //
-//Ajout texte tutorial              //
-//Ajout Commande                    //
-//Image controle après Jouer        //
+//Faire les tirs des ennemis        //
+//Intégrer les deux ennemis restants//
+//SONS                              //
 //////////////////////////////////////
 class shokumotsu extends Phaser.Scene{
     constructor(){
@@ -15,6 +14,7 @@ class shokumotsu extends Phaser.Scene{
 
 create ()
 {  
+    this.cameras.main.fadeIn(1000);
     this.add.image(-500, 0, 'bg').setOrigin(0,-1.08).setScale(0.7);
     this.add.image(903.5,0, 'bg').setOrigin(0,-1.08).setScale(0.7);
     this.add.image(2303.5,0, 'bg').setOrigin(0,-1.08).setScale(0.7);
@@ -29,12 +29,15 @@ create ()
     this.death_zone.setCollisionByExclusion(-1,true);
     this.death_zone_2 = map.createDynamicLayer('Death_Zone_2',tileset);
     this.death_zone_2.setCollisionByExclusion(-1,true);
+    this.death_zone_3 = map.createDynamicLayer('Death_Zone_3',tileset);
+    this.death_zone_3.setCollisionByExclusion(-1,true);
 
    
-    player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
-    //player = this.physics.add.sprite(2300,1100, 'sprite_buta_normal').setScale(0.06);
+    //player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
+    player = this.physics.add.sprite(2300,1100, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(1400, 1500, 'sprite_buta_normal').setScale(0.06);
-    //player = this.physics.add.sprite(800,1100, 'sprite_buta_normal').setScale(0.06);
+    //player = this.physics.add.sprite(1300,100, 'sprite_buta_normal').setScale(0.06);
+    //player = this.physics.add.sprite(1250, 500, 'sprite_buta_normal').setScale(0.06);
 
     full_heart_1 = this.add.sprite(50,30, 'full_heart').setScrollFactor(0).setScale(0.1);
     full_heart_2 = this.add.sprite(100,30, 'full_heart').setScrollFactor(0).setScale(0.1);
@@ -50,6 +53,7 @@ create ()
 
     jauge2 = this.add.sprite(105,75, 'sprite').setScale(0.4).setScrollFactor(0);
  /*    player = this.add.sprite(200,1550, 'sprite_buta').setScale(0.1); */
+    this.cameras.main.setBounds(0, 0, 2950,1600);
     this.cameras.main.startFollow(player, false, 1, 1, 0, 0);
     
     player.setBounce(0.0);
@@ -63,6 +67,7 @@ create ()
     this.physics.add.collider(player, ground);
     this.physics.add.collider(player, this.death_zone, death_Zone_Spawnpoint, null, this);
     this.physics.add.collider(player, this.death_zone_2, death_Zone_Spawnpoint_2, null, this);
+    this.physics.add.collider(player, this.death_zone_3, death_Zone_Spawnpoint_3, null, this);
 
 //CAISSE
     const CaisseObjects = map.getObjectLayer('Caisse').objects;
@@ -202,6 +207,29 @@ create ()
         ennemi.direction = 'RIGHT';
     }
 
+//MAGE 
+
+    this.MageObjects = map.getObjectLayer('Mage').objects;
+
+    this.mages = this.physics.add.group({
+        immovable:true,
+        allowGravity:true,
+    });
+
+    for(const mage of this.MageObjects){
+        this.mages.create(mage.x, mage.y-50,'mage')
+            .setScale(0.25)
+            .setGravityY(300)
+            .setSize(200,275)
+            .setOffset(100,50);
+    }
+
+    for(const mage of this.mages.children.entries){
+        this.physics.add.collider(mage, ground);
+        this.physics.add.collider(mage, this.caisses);
+        this.physics.add.collider(player, mage, Fonction_Mage, null, this);
+    }
+
 //HIDE_ENNEMIS 
 
     this.Hide_EnnemiObjects = map.getObjectLayer('Hide_Ennemi').objects;
@@ -226,25 +254,25 @@ create ()
     }
 
 //IMMOBILE_ENNEMIS 
+    const immobile_ennemiObjects = map.getObjectLayer('Arba_Ennemi').objects;
 
-    this.Immobile_EnnemiObjects = map.getObjectLayer('Immobile_Ennemi').objects;
-
-    this.immobile_ennemis = this.physics.add.group({
+    this.arbas = this.physics.add.group({
         immovable:true,
         allowGravity:true,
     });
 
-    for(const immobile_ennemi of this.Immobile_EnnemiObjects){
-        this.immobile_ennemis.create(immobile_ennemi.x, immobile_ennemi.y-50,'ennemi_bouclier')
-            .setScale(0.2)
+    for(const arba of immobile_ennemiObjects){
+        this.arbas.create(arba.x, arba.y-50,'ennemi_arba')
+            .setScale(0.25)
             .setGravityY(300)
             .setFlipX(true);
     }
 
-    for(const immobile_ennemi of this.immobile_ennemis.children.entries){
-        this.physics.add.collider(immobile_ennemi, ground);
-        this.physics.add.collider(immobile_ennemi, this.caisses);
-        this.physics.add.collider(player, immobile_ennemi, Fonction_Immobile_Ennemi, null, this);
+    for(const arba of this.arbas.children.entries){
+        arba.direction='LEFT';
+        this.physics.add.collider(arba, ground);
+        this.physics.add.collider(arba, this.caisses);
+        this.physics.add.collider(player, arba, Fonction_Immobile_Ennemi, null, this);
     }
 
 //IMMOBILE_ENNEMIS_SENSIBLE_GLACE
@@ -267,7 +295,7 @@ for(const immobile_ennemi_sensible_glace of this.Immobile_Ennemi_Sensible_GlaceO
 for(const immobile_ennemi_sensible_glace of this.immobile_ennemis_sensible_glace.children.entries){
     this.physics.add.collider(immobile_ennemi_sensible_glace, ground);
     this.physics.add.collider(immobile_ennemi_sensible_glace, this.caisses);
-    this.physics.add.collider(player, immobile_ennemi_sensible_glace, Fonction_Immobile_Ennemi, null, this);
+    this.physics.add.collider(player, immobile_ennemi_sensible_glace, Fonction_Immobile_Ennemi_Sensible_Glace, null, this);
 }
 
 //MASSE_ENNEMIS 
@@ -275,7 +303,7 @@ for(const immobile_ennemi_sensible_glace of this.immobile_ennemis_sensible_glace
 this.Masse_EnnemiObjects = map.getObjectLayer('Masse_Ennemi').objects;
 
 this.masse_ennemis = this.physics.add.group({
-    immovable:false,
+    immovable:true,
     allowGravity:true,
 });
 
@@ -358,6 +386,15 @@ const Respawn_GlaceObjects = map.getObjectLayer('Respawn_Glace').objects;
         allowGravity:true,
     });
 
+//FLECHES 
+    this.fleches = this.physics.add.group({
+        allowGravity:true,
+    });
+
+//ORBES
+    this.orbes = this.physics.add.group({
+        allowGravity:true,
+    });
 
 //Anim_JAUGE
     this.anims.create({
@@ -747,8 +784,79 @@ this.anims.create({
     frameRate: 10,
     repeat: -1
 }); 
-}
 
+///////////
+///Arba////
+/////////// 
+this.anims.create({
+    key: 'arba_move',
+    frames: this.anims.generateFrameNumbers('ennemi_arba', {start: 0, end: 3}),
+    frameRate: 5,
+    repeat: -1
+});
+this.anims.create({
+    key: 'arba_static',
+    frames: this.anims.generateFrameNumbers('ennemi_arba', {start: 0, end: 0}),
+    frameRate: 10,
+    repeat: -1
+});
+this.anims.create({
+    key: 'arba_attack',
+    frames: this.anims.generateFrameNumbers('ennemi_arba', {start: 4, end: 6}),
+    frameRate: 5,
+    repeat: -1
+});
+this.anims.create({
+    key: 'arba_death',
+    frames: this.anims.generateFrameNumbers('ennemi_arba', {start: 7, end: 8}),
+    frameRate: 5,
+    repeat: -1
+});  
+
+
+this.anims.create({
+    key: 'ennemi_shield',
+    frames: this.anims.generateFrameNumbers('ennemi_bouclier', {start: 0, end: 0}),
+    frameRate: 10,
+    repeat: -1
+}); 
+
+///////////
+///Mage////
+/////////// 
+this.anims.create({
+    key: 'mage_move',
+    frames: this.anims.generateFrameNumbers('mage', {start: 0, end: 3}),
+    frameRate: 5,
+    repeat: -1
+});
+this.anims.create({
+    key: 'mage_static',
+    frames: this.anims.generateFrameNumbers('mage', {start: 0, end: 0}),
+    frameRate: 10,
+    repeat: -1
+});
+this.anims.create({
+    key: 'mage_attack',
+    frames: this.anims.generateFrameNumbers('mage', {start: 4, end: 6}),
+    frameRate: 5,
+    repeat: -1
+});
+this.anims.create({
+    key: 'mage_death',
+    frames: this.anims.generateFrameNumbers('mage', {start: 7, end: 10}),
+    frameRate: 5,
+    repeat: -1
+});  
+
+
+this.anims.create({
+    key: 'ennemi_shield',
+    frames: this.anims.generateFrameNumbers('ennemi_bouclier', {start: 0, end: 0}),
+    frameRate: 10,
+    repeat: -1
+}); 
+}
 //CONTROLE
 //GOUPDATE 
 update ()
@@ -809,7 +917,7 @@ update ()
                 player.anims.play('buta_feu_saut_droit', true).setFlipX(false);
             }
             if(cursors.left.isDown && Roulade.isUp && cursors.up.isDown && Buta_Feu == true|| cursors.left.isDown && onGround==false && Buta_Feu == true){
-                player.anims.play('buta_feu_saut_gauche', true).setFlipX(true);
+                player.anims.play('buta_feu_saut_droit', true).setFlipX(true);
             }
     //BUTA_GLACE
         if(cursors.left.isDown && Roulade.isUp && Buta_Glace == true){
@@ -1003,9 +1111,9 @@ update ()
             this.physics.add.overlap(boules_de_feu, this.ennemis, Kill_Ennemi, null, this);
             this.physics.add.overlap(boules_de_feu, this.masse_ennemis, Kill_Masse_Ennemi, null, this);
             this.physics.add.overlap(boules_de_feu, this.hide_ennemis, Hide_Ennemi, null, this);
-            this.physics.add.overlap(boules_de_feu, this.immobile_ennemis, Kill_Ennemi, null, this);
-            this.physics.add.overlap(boules_de_feu, this.immobile_ennemis_sensible_glace, Kill_Ennemi, null, this);
-            this.physics.add.overlap(boules_de_feu, this.caisses, destroyBox, null, this);  
+            this.physics.add.overlap(boules_de_feu, this.arbas, Kill_Ennemi_Arba, null, this);
+            this.physics.add.overlap(boules_de_feu, this.caisses, destroyBox, null, this);
+            this.physics.add.overlap(boules_de_feu, this.mages, Kill_Mage, null, this);  
         }       
     }
 
@@ -1157,6 +1265,36 @@ update ()
             }
                     
         }
+        
+        for (const immobile_ennemi_sensible_glace of this.immobile_ennemis_sensible_glace.children.entries) {
+            if(immobile_ennemi_sensible_glace.direction=='Stop'){
+                immobile_ennemi_sensible_glace.setVelocityX(0);
+                
+            }
+            else if(immobile_ennemi_sensible_glace.direction!=='Stop' && contact!=true && epeiste_death!==true){
+                if (player.x - immobile_ennemi_sensible_glace.x < 0) {
+                    immobile_ennemi_sensible_glace.direction = 'LEFT';
+                    immobile_ennemi_sensible_glace.anims.play("epeiste_static", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(200,275)
+                    .setOffset(100,50)
+                    .setFlipX(false);
+                    
+                }
+
+                if (player.x - immobile_ennemi_sensible_glace.x > 0) {
+                    immobile_ennemi_sensible_glace.direction = 'RIGHT';
+                    immobile_ennemi_sensible_glace.anims.play("epeiste_static", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(200,275)
+                    .setOffset(100,50)
+                    .setFlipX(true);
+                }
+            }
+                    
+        }
 
         for (const masse_ennemi of this.masse_ennemis.children.entries) {
             if(masse_ennemi.direction=='Stop'){
@@ -1169,7 +1307,7 @@ update ()
                     masse_ennemi.anims.play("masse_static", true)
                     .setScale(0.3)
                     .setGravityY(300)
-                    .setSize(200,275)
+                    .setSize(250,260)
                     .setOffset(50,0)
                     .setFlipX(false); 
                 }
@@ -1179,13 +1317,120 @@ update ()
                     masse_ennemi.anims.play("masse_static", true)
                     .setScale(0.3)
                     .setGravityY(300)
-                    .setSize(200,275)
-                    .setOffset(50,0)
+                    .setSize(250,260)
+                    .setOffset(30,0)
                     .setFlipX(true);
                 }
             }
                     
         }
+        
+        cooldownTirSniperEnnemiBeforeShoot--
+        if(cooldownTirSniperEnnemiBeforeShoot<=0){
+        cooldownTirSniperEnnemiBeforeShoot=cooldownTirSniperEnnemi
+
+        for (const arba of this.arbas.children.entries) {
+            
+            if (player.x - arba.x < 0) {
+                arba.anims.play("arba_attack", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(200,240)
+                    .setOffset(30,0)
+                    .setFlipX(false);
+                var fleche = this.fleches.create(arba.x, arba.y, 'fleches').setFlipX(false).setScale(0.4);
+                fleche.setVelocity(-400,0);
+                fleche.body.setAllowGravity(false);
+                this.physics.add.overlap(player, fleche, Fonction_Fleche, null, this);
+                for (const fleche of this.fleches.children.entries) {
+                    this.physics.moveTo(fleche, player.x,player.y, vitesseFlecheEnnemi);
+                }
+                setTimeout(function(){arba.anims.play("arba_static", true)
+                .setScale(0.25)
+                .setGravityY(300)
+                .setSize(200,240)
+                .setOffset(30,0)
+                .setFlipX(false);}, 750);
+            }
+            if (player.x - arba.x > 0) {
+                arba.anims.play("arba_attack", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(200,240)
+                    .setOffset(30,0)
+                    .setFlipX(true);
+                var fleche = this.fleches.create(arba.x, arba.y, 'fleches').setFlipX(true).setScale(0.4);
+                fleche.setVelocity(400,0);
+                fleche.body.setAllowGravity(false);
+                this.physics.add.overlap(player, fleche, Fonction_Fleche, null, this);
+                for (const fleche of this.fleches.children.entries) {
+                    this.physics.moveTo(fleche, player.x,player.y, vitesseFlecheEnnemi);
+                }
+                setTimeout(function(){arba.anims.play("arba_static", true)
+                .setScale(0.25)
+                .setGravityY(300)
+                .setSize(200,240)
+                .setOffset(30,0)
+                .setFlipX(true);}, 750);
+                }
+            this.physics.add.collider(fleche,ground, destroyFleches, null, this);
+        }
+    }
+
+    if(player.x>=1250 && player.y<=600){
+            cooldownBouleMageEnnemiBeforeShoot--
+            if(cooldownBouleMageEnnemiBeforeShoot<=0){
+            cooldownBouleMageEnnemiBeforeShoot=cooldownBouleMageEnnemi
+
+        for (const mage of this.mages.children.entries) {
+            
+            if (player.x - mage.x < 0 && cooldownRecalculationOrbeDirection==cooldownRecalculationOrbeDirectionReset) {
+                mage.anims.play("mage_attack", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(240,340)
+                    .setOffset(50,0)
+                    .setFlipX(false);
+                var orbe = this.orbes.create(mage.x, mage.y, 'orbe').setFlipX(false).setScale(0.4);
+                orbe.setVelocity(-400,0);
+                orbe.body.setAllowGravity(true);
+                this.physics.add.overlap(player, orbe, Fonction_Boule_Mage, null, this);
+                for (const orbe of this.orbes.children.entries) {
+                this.physics.moveTo(orbe, player.x,player.y, vitesseBouleMageEnnemi);
+                setTimeout(function(){mage.anims.play("mage_static", true)
+                .setScale(0.25)
+                .setGravityY(300)
+                .setSize(240,340)
+                .setOffset(30,0)
+                .setFlipX(false);}, 750);
+            }
+        }
+            if (player.x - mage.x > 0 && cooldownRecalculationOrbeDirection==cooldownRecalculationOrbeDirectionReset) {
+                mage.anims.play("mage_attack", true)
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(240,340)
+                    .setOffset(30,0)
+                    .setFlipX(true);
+                    var orbe = this.orbes.create(mage.x, mage.y, 'orbe').setFlipX(false).setScale(0.4);
+                    orbe.setVelocity(400,0);
+                orbe.body.setAllowGravity(true);
+                this.physics.add.overlap(player, orbe, Fonction_Boule_Mage, null, this);
+                for (const orbe of this.orbes.children.entries) {
+                this.physics.moveTo(orbe, player.x,player.y, vitesseBouleMageEnnemi);
+                setTimeout(function(){mage.anims.play("mage_static", true)
+                .setScale(0.25)
+                .setGravityY(300)
+                .setSize(240,340)
+                .setOffset(30,0)
+                .setFlipX(true);}, 750);
+                }
+            }
+            //this.physics.add.collider(orbe,ground, destroyOrbe, null, this);
+            setTimeout(function(){orbe.destroy();}, 10000);
+        }
+    }
+    }
 
         if(doublesaut===true)
         {
@@ -1317,6 +1562,13 @@ update ()
         BDG_reload=false;
     }
 
+    function destroyFleches(fleche, ground){
+        fleche.destroy();
+        } 
+
+    function destroyOrbe(orbe, ground){
+        orbe.destroy();
+        } 
     function destroyFireball(boules_de_feu, ground){
         boules_de_feu.destroy();
         BDF_reload=true;
@@ -1428,9 +1680,19 @@ function Fonction_Ennemi(player,ennemi)
     contact=true;
     if(player.x - ennemi.x > 0){
         ennemi.anims.play("epeiste_attack", true).setScale(0.25).setFlipX(true);
+        setTimeout(function(){ennemi.anims.play("epeiste_static", true).setScale(0.25)
+        .setGravityY(300)
+        .setSize(200,275)
+        .setOffset(100,50)
+        .setFlipX(true);}, 650);
     }
     else if(player.x - ennemi.x < 0){
         ennemi.anims.play("epeiste_attack", true).setScale(0.25).setFlipX(false);
+        setTimeout(function(){ennemi.anims.play("epeiste_static", true).setScale(0.25)
+        .setGravityY(300)
+        .setSize(200,275)
+        .setOffset(100,50)
+        .setFlipX(false);}, 650);
     }
     setTimeout(function(){contact = false}, 500);
     }
@@ -1447,9 +1709,54 @@ function Fonction_Ennemi(player,ennemi)
         if (player_hp<=0){
             player_hp=0;
             this.physics.pause();
+            this.scene.start("defaite");
         }   
         setTimeout(function(){invincible = false}, 650);
     }
+}
+
+function Fonction_Mage(player,mage){
+    if (invincible == false){
+        player.x=1250;
+        player.y=500;  
+        player_hp = player_hp - 2;
+        invincible = true;
+        if (player_hp<=0){
+            player_hp=0;
+            this.physics.pause();
+        }   
+        setTimeout(function(){invincible = false}, 650);
+    }
+}
+
+function Fonction_Boule_Mage(player,orbe){
+    orbe.destroy();
+    if (invincible == false){
+        player.x=1250;
+        player.y=500;
+         player_hp = player_hp - 1;
+         invincible = true;
+    if (player_hp<=0){
+        player_hp=0;
+        this.physics.pause();
+        this.scene.start("defaite");
+    }   
+    setTimeout(function(){invincible = false}, 650);
+}
+}
+
+function Fonction_Fleche(player,fleche){
+    fleche.destroy();
+    if (invincible == false){ 
+    player_hp = player_hp - 1;
+    invincible = true;
+    if (player_hp<=0){
+        player_hp=0;
+        this.physics.pause();
+        this.scene.start("defaite");
+    }   
+    setTimeout(function(){invincible = false}, 650);
+}
 }
 
 function Fonction_Ennemi_Masse(player,masse_ennemi)
@@ -1459,14 +1766,16 @@ function Fonction_Ennemi_Masse(player,masse_ennemi)
     contact=true;
     ejection=true;
         if(player.x - masse_ennemi.x > 0 && ejection==true){
-                masse_ennemi.anims.play("masse_attack", true).setScale(0.25).setFlipX(true);
-                player.setVelocityX(500);
+                masse_ennemi.anims.play("masse_attack", true).setScale(0.3).setSize(250,260).setFlipX(true);
+                setTimeout(function(){player.setVelocityX(500);}, 400);
                 setTimeout(function(){ejection = false}, 500);
+                setTimeout(function(){masse_ennemi.anims.play("masse_static", true).setScale(0.3).setSize(250,260).setFlipX(true);}, 650);
             }
         else if(player.x - masse_ennemi.x < 0 && ejection==true){
-                masse_ennemi.anims.play("masse_attack", true).setScale(0.25).setFlipX(false);
-                player.setVelocityX(-500);
+                masse_ennemi.anims.play("masse_attack", true).setScale(0.3).setSize(250,260).setFlipX(false);
+                setTimeout(function(){player.setVelocityX(-500);}, 400);
                 setTimeout(function(){ejection = false}, 500);
+                setTimeout(function(){masse_ennemi.anims.play("masse_static", true).setScale(0.3).setSize(250,260).setFlipX(false);}, 650);
             }
     }
     setTimeout(function(){contact = false}, 500);
@@ -1483,6 +1792,7 @@ function Fonction_Ennemi_Masse(player,masse_ennemi)
         if (player_hp<=0){
             player_hp=0;
             this.physics.pause();
+            this.scene.start("defaite");
         }   
         setTimeout(function(){invincible = false}, 650);
     }
@@ -1501,6 +1811,7 @@ function Fonction_Hide_Ennemi(player, hide_ennemi){
         if (player_hp<=0){
             player_hp=0;
             this.physics.pause();
+            this.scene.start("defaite");
         }   
         setTimeout(function(){invincible = false}, 650);
     }
@@ -1519,10 +1830,55 @@ function Fonction_Immobile_Ennemi(player, immobile_ennemi){
         if (player_hp<=0){
             player_hp=0;
             this.physics.pause();
+            this.scene.start("defaite");
         }   
         setTimeout(function(){invincible = false}, 650);
     }
 }
+
+function Fonction_Immobile_Ennemi_Sensible_Glace(player, immobile_ennemi_sensible_glace){
+
+
+    if(immobile_ennemi_sensible_glace.direction!=='Stop')
+    {
+    contact=true;
+        if(player.x - immobile_ennemi_sensible_glace.x > 0){
+            immobile_ennemi_sensible_glace.anims.play("epeiste_attack", true).setScale(0.25).setFlipX(true);
+            setTimeout(function(){immobile_ennemi_sensible_glace.anims.play("epeiste_static", true).setScale(0.25)
+        .setGravityY(300)
+        .setSize(200,275)
+        .setOffset(100,50)
+        .setFlipX(true);}, 650);
+        }
+        else if(player.x - immobile_ennemi_sensible_glace.x < 0){
+            immobile_ennemi_sensible_glace.anims.play("epeiste_attack", true).setScale(0.25).setFlipX(false);
+            setTimeout(function(){immobile_ennemi_sensible_glace.anims.play("epeiste_static", true).setScale(0.25)
+        .setGravityY(300)
+        .setSize(200,275)
+        .setOffset(100,50)
+        .setFlipX(false);}, 650);
+        }
+        setTimeout(function(){contact = false}, 5000);
+    }   
+    if(immobile_ennemi_sensible_glace.direction=='Stop')
+    {
+        doublesaut=true;
+        onEnnemis=true;
+        jumpCount=0; 
+        contact=false;
+    }
+    else if (invincible == false){
+        player_hp = player_hp - 1;
+        invincible = true;
+        if (player_hp<=0){
+            player_hp=0;
+            this.physics.pause();
+            this.scene.start("defaite");
+        }   
+        setTimeout(function(){invincible = false}, 650);
+    }
+}
+
 
 function Kill_Ennemi(boules_de_feu,ennemi)
 {
@@ -1531,6 +1887,15 @@ function Kill_Ennemi(boules_de_feu,ennemi)
     boules_de_feu.destroy();
     BDF_reload=true;
     setTimeout(function(){ennemi.destroy();}, 250);
+    setTimeout(function(){epeiste_death=false;}, 250);
+}
+
+function Kill_Ennemi_Arba(boules_de_feu,immobile_ennemi){
+    epeiste_death=true;
+    immobile_ennemi.anims.play("arba_death", true);
+    boules_de_feu.destroy();
+    BDF_reload=true;
+    setTimeout(function(){immobile_ennemi.destroy();}, 250);
     setTimeout(function(){epeiste_death=false;}, 250);
 }
 
@@ -1548,6 +1913,27 @@ function Kill_Masse_Ennemi(boules_de_feu,masse_ennemi)
     }
 }
 
+function Kill_Mage(boules_de_feu,mage)
+{
+    boules_de_feu.destroy();
+    BDF_reload=true;
+    if(invincible_ennemi==false){
+        console.log("touché");
+        count_bdf_masse+=1
+        invincible_ennemi=true;
+        setTimeout(function(){invincible_ennemi = false}, 650);
+    }
+    if(count_bdf_masse==5){
+        epeiste_death=true;
+        mage.anims.play("mage_death", true);
+        
+        setTimeout(function(){mage.destroy();}, 750);
+        setTimeout(function(){epeiste_death=false;}, 250);
+        //this.scene.start("victoire");
+    }
+    
+}
+
 function Hide_Ennemi(boules_de_feu,hide_ennemi)
 {
     for(const hide_ennemi of this.hide_ennemis.children.entries){
@@ -1558,49 +1944,73 @@ function Hide_Ennemi(boules_de_feu,hide_ennemi)
     bool_hide_ennemi=true;
 }
 
-function Gele_Ennemi(boules_de_glace,ennemi)
-{
-    boules_de_glace.destroy();
-    BDG_reload=true;
-    BDG_Touch=true;  
-    if(ennemi.movement!== 'Stop' && BDG_Touch==true){
-        ennemi.direction='Stop';
-        movement=false;
-        damageOff=true;
-        ennemi.anims.play('Freeze',true)
-        .setScale(0.15)
-        .setSize(300,550)
-        .setOffset(50,-100);
-        this.physics.add.collider(ennemi, ground);
-        this.physics.add.collider(ennemi, caisses);
-        this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [ennemi], this);
-    }
-}
-
-function Gele_Ennemi(boules_de_glace,hide_ennemi)
+function Gele_Ennemi(boules_de_glace,hide_ennemi,immobile_ennemi_sensible_glace, ennemi)
 {
     boules_de_glace.destroy();
     BDG_reload=true;
     BDG_Touch=true;
-    gel=1;  
+    gel+=1;  
     if(hide_ennemi.movement!== 'Stop' && BDG_Touch==true){
+        gel = true
         hide_ennemi.direction='Stop';
         movement=false;
         damageOff=true;
         hide_ennemi.anims.play('Freeze',true)
         .setScale(0.15)
-        .setSize(300,550)
-        .setOffset(50,-100);
+        .setSize(300,450)
+        .setOffset(50,-40);
         this.physics.add.collider(hide_ennemi, ground);
         this.physics.add.collider(hide_ennemi, caisses);
         this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [hide_ennemi], this);
-
-    
+        if(death_zone==true && gel==true){
+        setTimeout(function(){hide_ennemi.destroy();},5000)
+        }
     }
+    else if(immobile_ennemi_sensible_glace.movement!== 'Stop' && BDG_Touch==true){
+        immobile_ennemi_sensible_glace.direction='Stop';
+        movement=false;
+        damageOff=true;
+        immobile_ennemi_sensible_glace.anims.play('Freeze',true)
+        .setScale(0.15)
+        .setSize(300,450)
+        .setOffset(50,-40);
+        this.physics.add.collider(immobile_ennemi_sensible_glace, ground);
+        this.physics.add.collider(immobile_ennemi_sensible_glace, caisses);
+        this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [immobile_ennemi_sensible_glace], this);
+    }
+    else if(ennemi.movement!== 'Stop' && BDG_Touch==true){
+        ennemi.direction='Stop';
+        movement=false;
+        damageOff=true;
+        ennemi.anims.play('Freeze',true)
+        .setScale(0.15)
+        .setSize(300,450)
+        .setOffset(50,-40);
+        this.physics.add.collider(ennemi, ground);
+        this.physics.add.collider(ennemi, caisses);
+        this.time.delayedCall(timeoutDelayMovementEnnemi, endStopMovement, [ennemi], this);
+    }
+    
 }
+
+function tirEnnemi(arba){ 
+        for (const arba of this.arbas.children.entries) {
+        var fleche = this.fleches.create(arba.x, arba.y, 'fleches').setFlipX(true).setScale(0.80);
+        fleche.setVelocity(100,0);
+        fleche.body.setAllowGravity(false);
+  }
+
+
+}
+
 
 function endStopMovement(ennemi){ 
     ennemi.direction='RIGHT';
+    damageOff=false;
+}
+
+function endStopMovement(immobile_ennemi_sensible_glace){ 
+    immobile_ennemi_sensible_glace.direction='RIGHT';
     damageOff=false;
 }
 
@@ -1614,22 +2024,31 @@ function endStopMovement(hide_ennemi){
     damageOff=false;
 }
 
+function Reload_fleche(fleche){
+    Fleche_reload=true;
+}
+
 function death_Zone_Spawnpoint(){
+    this.cameras.main.fadeIn(1000);
             player_hp = player_hp - 1;
             if (player_hp<=0){
                 player_hp=0;
                 this.physics.pause();
+                this.scene.start("defaite");
             }
             player.x=1850;
             player.y=1350;  
 }
 
 function death_Zone_Spawnpoint_2(player,hide_ennemi){
+    this.cameras.main.fadeIn(1000);
             death_zone=true;
+            hide_ennemi.destroy();
             player_hp = player_hp - 1;
             if (player_hp<=0){
                 player_hp=0;
                 this.physics.pause();
+                this.scene.start("defaite");
             }   
             console.log("pop");
             Buta_normal=true;
@@ -1652,4 +2071,16 @@ function death_Zone_Spawnpoint_2(player,hide_ennemi){
                 this.physics.add.collider(hide_ennemi, this.caisses);
                 this.physics.add.collider(player, hide_ennemi, Fonction_Hide_Ennemi, null, this);
             }
+}
+
+function death_Zone_Spawnpoint_3(){
+    this.cameras.main.fadeIn(1000);
+    player_hp = player_hp - 1;
+    if (player_hp<=0){
+        player_hp=0;
+        this.physics.pause();
+        this.scene.start("defaite");
+    }
+    player.x=1250;
+    player.y=500;  
 }
