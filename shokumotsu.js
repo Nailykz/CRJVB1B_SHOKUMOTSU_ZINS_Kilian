@@ -1,8 +1,4 @@
 //////////////////////////////////////
-//Changer fin de map                //
-//Faire une fin                     //
-//Faire les tirs des ennemis        //
-//Intégrer les deux ennemis restants//
 //SONS                              //
 //////////////////////////////////////
 class shokumotsu extends Phaser.Scene{
@@ -33,8 +29,8 @@ create ()
     this.death_zone_3.setCollisionByExclusion(-1,true);
 
    
-    //player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
-    player = this.physics.add.sprite(2300,1100, 'sprite_buta_normal').setScale(0.06);
+    player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
+    //player = this.physics.add.sprite(2300,1100, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(1400, 1500, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(1300,100, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(1250, 500, 'sprite_buta_normal').setScale(0.06);

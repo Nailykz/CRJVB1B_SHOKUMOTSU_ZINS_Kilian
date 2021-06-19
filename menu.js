@@ -150,14 +150,14 @@ preload(){
     this.load.image('box','assets/box.png');
     this.load.image('bnormal','assets/buta.png');
     this.load.image('gamelle','assets/full_heart.png');
-    this.load.image('chilli_pepper','assets/piment.png');
-    this.load.image('ice_cream','assets/glace.png');
+    this.load.image('chilli_pepper','assets/Piment.png');
+    this.load.image('ice_cream','assets/Glace.png');
     this.load.image('boule_de_feu_droit','assets/boule_de_feu_droit.png');
     this.load.image('boule_de_feu_gauche','assets/boule_de_feu_gauche.png');
     this.load.image('boule_de_glace_droit','assets/boule_de_glace_droit.png');
     this.load.image('boule_de_glace_gauche','assets/boule_de_glace_gauche.png');
-    this.load.image('chicken','assets/poulet.png');
-    this.load.image('food','assets/aliment.png');
+    this.load.image('chicken','assets/Poulet.png');
+    this.load.image('food','assets/Aliment.png');
     //this.load.image('ennemi','assets/Perso_3.png');
     //this.load.tilemapTiledJSON('map','assets/tiles/RaionVille.json');
     this.load.tilemapTiledJSON('map','assets/tiles/Raion_Full.json');
