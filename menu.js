@@ -69,7 +69,7 @@ var competence=false;
 var aliment;
 var aliments;
 //var jauge=0;
-var jauge=10000;
+var jauge=0;
 var jaugeText;
 //ENNEMI
 var ennemi;
@@ -87,7 +87,7 @@ var Fleche_reload=true;
 var immobile_ennemi;
 var invincible_ennemi=false;
 //HP
-var player_hp = 1000;
+var player_hp = 5;
 var invincible = false;
 var full_heart_1;
 var full_heart_2;
@@ -122,7 +122,7 @@ var bouleMage;
 var cooldownRecalculationOrbeDirection = 100
 var cooldownRecalculationOrbeDirectionReset = cooldownRecalculationOrbeDirection
 
-
+var timeoutDelayScreen=50;
 class menu extends Phaser.Scene{
     constructor(){
         super("menu");
@@ -139,6 +139,12 @@ preload(){
     this.load.image('skip_repas_false', 'assets/skip_repas_false.png');
     this.load.image('skip_repas_true', 'assets/skip_repas_true.png');
     this.load.image('bg', 'assets/decor2.jpg');
+    this.load.image('game_over','assets/game_over.jpg');
+    this.load.image('game_over_text1','assets/game_over_text1.png');
+    this.load.image('game_over_text2','assets/game_over_text2.png');
+    this.load.image('game_over_rejouer','assets/game_over_rejouer.png');
+    this.load.image('rejouer','assets/Rejouer.png');
+    this.load.image('quitter2','assets/Quitter2.png');
     //this.load.image('bg_menu', 'assets/decor.jpg');
     this.load.image('tiles','assets/tiles/tiles.png');
     this.load.image('box','assets/box.png');

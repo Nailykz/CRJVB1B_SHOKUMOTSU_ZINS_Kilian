@@ -6,6 +6,13 @@ class affichage_ctrl extends Phaser.Scene{
     }
 
     create(){
+        player_hp=5;
+        Buta_normal=true;
+        Buta_Feu=false;
+        Buta_Glace=false;
+        Buta_Aile=false;
+        jauge=0;
+        cursors = this.input.keyboard.createCursorKeys();
         this.cameras.main.fadeIn(1000);
         this.add.image(0,0, "bg").setOrigin(0).setScale(1);
         this.add.image(0,0,"Menu_controle_test").setOrigin(-0.5,0).setScale(0.45);

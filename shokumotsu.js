@@ -65,6 +65,13 @@ create ()
     Jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);  
     Competence_Speciale = this.input.keyboard.addKey('F');
     Roulade = this.input.keyboard.addKey('E');
+    cursors.left.reset();
+    cursors.right.reset();
+    cursors.up.reset();
+    cursors.down.reset();
+    Roulade.reset();
+    Competence_Speciale.reset()
+    Jump.reset();
 
     this.physics.add.collider(player, ground);
     this.physics.add.collider(player, this.death_zone, death_Zone_Spawnpoint, null, this);
@@ -1344,9 +1351,6 @@ update ()
                 fleche.setVelocity(-400,0);
                 fleche.body.setAllowGravity(false);
                 this.physics.add.overlap(player, fleche, Fonction_Fleche, null, this);
-                for (const fleche of this.fleches.children.entries) {
-                    this.physics.moveTo(fleche, player.x,player.y, vitesseFlecheEnnemi);
-                }
                 setTimeout(function(){arba.anims.play("arba_static", true)
                 .setScale(0.25)
                 .setGravityY(300)
@@ -1365,9 +1369,6 @@ update ()
                 fleche.setVelocity(400,0);
                 fleche.body.setAllowGravity(false);
                 this.physics.add.overlap(player, fleche, Fonction_Fleche, null, this);
-                for (const fleche of this.fleches.children.entries) {
-                    this.physics.moveTo(fleche, player.x,player.y, vitesseFlecheEnnemi);
-                }
                 setTimeout(function(){arba.anims.play("arba_static", true)
                 .setScale(0.25)
                 .setGravityY(300)
@@ -1428,7 +1429,6 @@ update ()
                 .setFlipX(true);}, 750);
                 }
             }
-            //this.physics.add.collider(orbe,ground, destroyOrbe, null, this);
             setTimeout(function(){orbe.destroy();}, 10000);
         }
     }
@@ -1711,7 +1711,7 @@ function Fonction_Ennemi(player,ennemi)
         if (player_hp<=0){
             player_hp=0;
             this.physics.pause();
-            //this.scene.start("defaite");
+            this.scene.start("defaite");
         }   
         setTimeout(function(){invincible = false}, 650);
     }
@@ -1741,7 +1741,7 @@ function Fonction_Boule_Mage(player,orbe){
     if (player_hp<=0){
         player_hp=0;
         this.physics.pause();
-        //this.scene.start("defaite");
+        this.scene.start("defaite");
     }   
     setTimeout(function(){invincible = false}, 650);
 }
@@ -1755,7 +1755,7 @@ function Fonction_Fleche(player,fleche){
     if (player_hp<=0){
         player_hp=0;
         this.physics.pause();
-        //this.scene.start("defaite");
+        this.scene.start("defaite");
     }   
     setTimeout(function(){invincible = false}, 650);
 }
@@ -1794,13 +1794,36 @@ function Fonction_Ennemi_Masse(player,masse_ennemi)
         if (player_hp<=0){
             player_hp=0;
             this.physics.pause();
-            //this.scene.start("defaite");
+            this.scene.start("defaite");
         }   
         setTimeout(function(){invincible = false}, 650);
     }
 }
 
 function Fonction_Hide_Ennemi(player, hide_ennemi){
+    if(hide_ennemi.direction!=='Stop')
+    {
+    contact=true;
+        if(player.x - hide_ennemi.x > 0){
+            console.log("b")
+            hide_ennemi.anims.play("epeiste_attack", true).setScale(0.25).setFlipX(true);
+            setTimeout(function(){hide_ennemi.anims.play("epeiste_static", true).setScale(0.25)
+                .setGravityY(300)
+                .setSize(200,275)
+                .setOffset(100,50)
+                .setFlipX(true);}, 650);
+        }
+        else if(player.x - hide_ennemi.x < 0){
+            console.log("c")
+            hide_ennemi.anims.play("epeiste_attack", true).setScale(0.25).setFlipX(false);
+            setTimeout(function(){hide_ennemi.anims.play("epeiste_static", true).setScale(0.25)
+                .setGravityY(300)
+                .setSize(200,275)
+                .setOffset(100,50)
+                .setFlipX(false);}, 650);
+        }
+    }
+    setTimeout(function(){contact = false}, 500);
     if(hide_ennemi.direction=='Stop')
     {
         doublesaut=true;
@@ -1813,7 +1836,7 @@ function Fonction_Hide_Ennemi(player, hide_ennemi){
         if (player_hp<=0){
             player_hp=0;
             this.physics.pause();
-            //this.scene.start("defaite");
+            this.scene.start("defaite");
         }   
         setTimeout(function(){invincible = false}, 650);
     }
@@ -1832,7 +1855,7 @@ function Fonction_Immobile_Ennemi(player, immobile_ennemi){
         if (player_hp<=0){
             player_hp=0;
             this.physics.pause();
-            //this.scene.start("defaite");
+            this.scene.start("defaite");
         }   
         setTimeout(function(){invincible = false}, 650);
     }
@@ -1875,7 +1898,7 @@ function Fonction_Immobile_Ennemi_Sensible_Glace(player, immobile_ennemi_sensibl
         if (player_hp<=0){
             player_hp=0;
             this.physics.pause();
-            //this.scene.start("defaite");
+            this.scene.start("defaite");
         }   
         setTimeout(function(){invincible = false}, 650);
     }
@@ -2055,7 +2078,7 @@ function death_Zone_Spawnpoint(){
             if (player_hp<=0){
                 player_hp=0;
                 this.physics.pause();
-                //this.scene.start("defaite");
+                this.scene.start("defaite");
             }
             player.x=1850;
             player.y=1350;  
@@ -2069,9 +2092,8 @@ function death_Zone_Spawnpoint_2(player,hide_ennemi){
             if (player_hp<=0){
                 player_hp=0;
                 this.physics.pause();
-                //this.scene.start("defaite");
+                this.scene.start("defaite");
             }   
-            console.log("pop");
             Buta_normal=true;
             Buta_Feu=false;
             Buta_Glace=false;
@@ -2092,6 +2114,7 @@ function death_Zone_Spawnpoint_2(player,hide_ennemi){
                 this.physics.add.collider(hide_ennemi, this.caisses);
                 this.physics.add.collider(player, hide_ennemi, Fonction_Hide_Ennemi, null, this);
             }
+            hide_ennemi.direction='RIGHT';
         }
 
 function death_Zone_Spawnpoint_3(){
@@ -2100,8 +2123,12 @@ function death_Zone_Spawnpoint_3(){
     if (player_hp<=0){
         player_hp=0;
         this.physics.pause();
-        //this.scene.start("defaite");
+        this.scene.start("defaite");
     }
     player.x=1250;
     player.y=500;  
+}
+
+function change_screen(){
+    
 }
