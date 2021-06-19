@@ -10,6 +10,19 @@ class shokumotsu extends Phaser.Scene{
 
 create ()
 {  
+    this.Ambiance = this.sound.add('Ambiance')
+    var musicConfig = {
+        mute : false,
+        volume : 0.01,
+        rate : 1,
+        deturne : 0,
+        seek : 0,
+        loop : false,
+        delay : 0,
+
+    }
+    this.Ambiance.play(musicConfig)
+
     this.cameras.main.fadeIn(1000);
     this.add.image(-500, 0, 'bg').setOrigin(0,-1.08).setScale(0.7);
     this.add.image(903.5,0, 'bg').setOrigin(0,-1.08).setScale(0.7);
@@ -29,11 +42,11 @@ create ()
     this.death_zone_3.setCollisionByExclusion(-1,true);
 
    
-    //player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
+    player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(2300,1100, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(1400, 1500, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(1300,100, 'sprite_buta_normal').setScale(0.06);
-    player = this.physics.add.sprite(1250, 500, 'sprite_buta_normal').setScale(0.06);
+    //player = this.physics.add.sprite(1250, 500, 'sprite_buta_normal').setScale(0.06);
 
     full_heart_1 = this.add.sprite(50,30, 'full_heart').setScrollFactor(0).setScale(0.1);
     full_heart_2 = this.add.sprite(100,30, 'full_heart').setScrollFactor(0).setScale(0.1);
@@ -1119,6 +1132,19 @@ update ()
             this.physics.add.overlap(boules_de_feu, this.arbas, Kill_Ennemi_Arba, null, this);
             this.physics.add.overlap(boules_de_feu, this.caisses, destroyBox, null, this);
             this.physics.add.overlap(boules_de_feu, this.mages, Kill_Mage, null, this);  
+            this.BDF_SFX = this.sound.add('sound_bdf')
+            var BDF_Config = {
+                mute : false,
+                volume : 0.01,
+                rate : 1,
+                deturne : 0,
+                seek : 0,
+                loop : false,
+                delay : 0,
+    
+                }
+            this.BDF_SFX.play(BDF_Config)
+
         }       
     }
 
@@ -1131,6 +1157,18 @@ update ()
             this.physics.add.overlap(boules_de_glace, this.ennemis, Gele_Ennemi, null, this);
             this.physics.add.overlap(boules_de_glace, this.hide_ennemis, Gele_Ennemi, null, this);
             this.physics.add.overlap(boules_de_glace, this.immobile_ennemis_sensible_glace, Gele_Ennemi, null, this);
+            this.BDG_SFX = this.sound.add('sound_bdg')
+            var BDG_Config = {
+            mute : false,
+            volume : 0.01,
+            rate : 1,
+            deturne : 0,
+            seek : 0,
+            loop : false,
+            delay : 0,
+
+            }
+            this.BDG_SFX.play(BDG_Config)
         }       
     }
     if (Competence_Speciale.isDown)
@@ -1396,12 +1434,24 @@ update ()
                 this.physics.add.overlap(player, orbe, Fonction_Boule_Mage, null, this);
                 for (const orbe of this.orbes.children.entries) {
                 this.physics.moveTo(orbe, player.x,player.y, vitesseBouleMageEnnemi);
+                this.Orbe_Mage = this.sound.add('attaque_mage')
+                var Mage_Config = {
+                    mute : false,
+                    volume : 0.01,
+                    rate : 1,
+                    deturne : 0,
+                    seek : 0,
+                    loop : false,
+                    delay : 0,
+    
+                }
+                this.Orbe_Mage.play(Mage_Config)
                 setTimeout(function(){mage.anims.play("mage_static", true)
-                .setScale(0.25)
-                .setGravityY(300)
-                .setSize(240,340)
-                .setOffset(30,0)
-                .setFlipX(false);}, 750);
+                    .setScale(0.25)
+                    .setGravityY(300)
+                    .setSize(240,340)
+                    .setOffset(30,0)
+                    .setFlipX(false);}, 750);
             }
         }
             if (player.x - mage.x > 0 && cooldownRecalculationOrbeDirection==cooldownRecalculationOrbeDirectionReset) {
@@ -1413,16 +1463,16 @@ update ()
                     .setFlipX(true);
                     var orbe = this.orbes.create(mage.x, mage.y, 'orbe').setFlipX(false).setScale(0.4);
                     orbe.setVelocity(400,0);
-                orbe.body.setAllowGravity(true);
-                this.physics.add.overlap(player, orbe, Fonction_Boule_Mage, null, this);
-                for (const orbe of this.orbes.children.entries) {
-                this.physics.moveTo(orbe, player.x,player.y, vitesseBouleMageEnnemi);
-                setTimeout(function(){mage.anims.play("mage_static", true)
-                .setScale(0.25)
-                .setGravityY(300)
-                .setSize(240,340)
-                .setOffset(30,0)
-                .setFlipX(true);}, 750);
+                    orbe.body.setAllowGravity(true);
+                    this.physics.add.overlap(player, orbe, Fonction_Boule_Mage, null, this);
+                    for (const orbe of this.orbes.children.entries) {
+                    this.physics.moveTo(orbe, player.x,player.y, vitesseBouleMageEnnemi);
+                    setTimeout(function(){mage.anims.play("mage_static", true)
+                        .setScale(0.25)
+                        .setGravityY(300)
+                        .setSize(240,340)
+                        .setOffset(30,0)
+                        .setFlipX(true);}, 750);
                 }
             }
             setTimeout(function(){orbe.destroy();}, 10000);
@@ -1490,7 +1540,6 @@ update ()
         var boule_de_feu_droit = boules_de_feu.create(player.x, player.y-15, 'boule_de_feu_droit')
         .setGravityY(0)
         .setScale(0.1)
-
         var directionFireballPlayer = Math.round(Phaser.Math.Between(0,1))
 
         if(cursors.left.isDown){
@@ -1951,7 +2000,7 @@ function Kill_Mage(boules_de_feu,mage)
         
         setTimeout(function(){mage.destroy();}, 675);
         setTimeout(function(){epeiste_death=false;}, 250);
-        //this.scene.start("victoire");
+        this.scene.start("victoire");
     }
     
 }

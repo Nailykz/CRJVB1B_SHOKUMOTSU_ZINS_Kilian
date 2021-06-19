@@ -124,6 +124,9 @@ var cooldownRecalculationOrbeDirection = 100
 var cooldownRecalculationOrbeDirectionReset = cooldownRecalculationOrbeDirection
 
 var timeoutDelayScreen=50;
+
+var music;
+
 class menu extends Phaser.Scene{
     constructor(){
         super("menu");
@@ -132,6 +135,10 @@ class menu extends Phaser.Scene{
     }
 
 preload(){
+    this.load.audio('Ambiance', 'assets/SFX/Note.mp3');
+    this.load.audio('sound_bdf', 'assets/SFX/boule_de_feu.mp3');
+    this.load.audio('sound_bdg', 'assets/SFX/boule_de_feu.mp3');
+    this.load.audio('attaque_mage', 'assets/SFX/attaque_mage.mp3');
     this.load.image('menu', 'assets/Menu_Full_v2.png');
     this.load.image('jouer','assets/Jouer.png');
     this.load.image('quitter', 'assets/Quitter.png');
@@ -144,6 +151,7 @@ preload(){
     this.load.image('game_over_text1','assets/game_over_text1.png');
     this.load.image('game_over_text2','assets/game_over_text2.png');
     this.load.image('game_over_rejouer','assets/game_over_rejouer.png');
+    this.load.image('victory_screen','assets/victory_screen.png');
     this.load.image('rejouer','assets/Rejouer.png');
     this.load.image('quitter2','assets/Quitter2.png');
     //this.load.image('bg_menu', 'assets/decor.jpg');
