@@ -47,6 +47,7 @@ var boules_de_feu;
 var destroyFireball;
 var BDF_reload = true;
 var count_bdf_masse = 0;
+var count_bdf_mage = 0;
 //GLACE
 var Buta_Glace;
 var glace;

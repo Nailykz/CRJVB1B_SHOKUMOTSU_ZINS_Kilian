@@ -29,11 +29,11 @@ create ()
     this.death_zone_3.setCollisionByExclusion(-1,true);
 
    
-    player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
+    //player = this.physics.add.sprite(200,1450, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(2300,1100, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(1400, 1500, 'sprite_buta_normal').setScale(0.06);
     //player = this.physics.add.sprite(1300,100, 'sprite_buta_normal').setScale(0.06);
-    //player = this.physics.add.sprite(1250, 500, 'sprite_buta_normal').setScale(0.06);
+    player = this.physics.add.sprite(1250, 500, 'sprite_buta_normal').setScale(0.06);
 
     full_heart_1 = this.add.sprite(50,30, 'full_heart').setScrollFactor(0).setScale(0.1);
     full_heart_2 = this.add.sprite(100,30, 'full_heart').setScrollFactor(0).setScale(0.1);
@@ -1928,6 +1928,7 @@ function Kill_Masse_Ennemi(boules_de_feu,masse_ennemi)
     if(count_bdf_masse==2){
         epeiste_death=true;
         masse_ennemi.anims.play("masse_death", true);
+        count_bdf_masse=0;
         
         setTimeout(function(){masse_ennemi.destroy();}, 250);
         setTimeout(function(){epeiste_death=false;}, 250);
@@ -1940,15 +1941,15 @@ function Kill_Mage(boules_de_feu,mage)
     BDF_reload=true;
     if(invincible_ennemi==false){
         console.log("touché");
-        count_bdf_masse+=1
+        count_bdf_mage+=1
         invincible_ennemi=true;
         setTimeout(function(){invincible_ennemi = false}, 650);
     }
-    if(count_bdf_masse==5){
+    if(count_bdf_mage==5){
         epeiste_death=true;
         mage.anims.play("mage_death", true);
         
-        setTimeout(function(){mage.destroy();}, 750);
+        setTimeout(function(){mage.destroy();}, 675);
         setTimeout(function(){epeiste_death=false;}, 250);
         //this.scene.start("victoire");
     }
