@@ -12,6 +12,8 @@ class affichage_ctrl extends Phaser.Scene{
         Buta_Glace=false;
         Buta_Aile=false;
         jauge=0;
+        count_bdf_masse = 0;
+        count_bdf_mage = 0;
         cursors = this.input.keyboard.createCursorKeys();
         this.cameras.main.fadeIn(1000);
         this.add.image(0,0, "bg").setOrigin(0).setScale(1);
