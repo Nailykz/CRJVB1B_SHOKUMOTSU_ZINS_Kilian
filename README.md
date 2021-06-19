@@ -1,2 +1,2 @@
-# GD1B_MARIOLIKE_ZINS
+# CRJVB1B_SHOKUMOTSU_ZINS_Kilian
 Mario like / Self-made prog + assets + story
