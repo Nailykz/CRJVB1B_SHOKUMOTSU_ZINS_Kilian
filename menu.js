@@ -127,6 +127,13 @@ var timeoutDelayScreen=50;
 
 var music;
 
+var commandeMobile = false;
+
+var Touche_droite;
+var Touche_gauche;
+var Touche_haut;
+var Touche_bas;
+
 class menu extends Phaser.Scene{
     constructor(){
         super("menu");
@@ -152,8 +159,20 @@ preload(){
     this.load.image('game_over_text2','assets/game_over_text2.png');
     this.load.image('game_over_rejouer','assets/game_over_rejouer.png');
     this.load.image('victory_screen','assets/victory_screen.png');
+    this.load.image('victory_screen_text1','assets/victory_screen_text1.png');
+    this.load.image('victory_screen_text2','assets/victory_screen_text2.png');
+    this.load.image('victory_screen_text3','assets/victory_screen_text3.png');
     this.load.image('rejouer','assets/Rejouer.png');
     this.load.image('quitter2','assets/Quitter2.png');
+    this.load.image('mobile_off','assets/mobile_off.png');
+    this.load.image('mobile_on','assets/mobile_on.png');
+    this.load.image('Touche_droite','assets/Touche_droite.png');
+    this.load.image('Touche_gauche','assets/Touche_gauche.png');
+    this.load.image('Touche_haut','assets/Touche_haut.png');
+    this.load.image('Touche_bas','assets/Touche_bas.png');
+    this.load.image('Competence_Speciale','assets/Competence_Speciale.png');
+    this.load.image('Roulade','assets/Roulade.png');
+
     //this.load.image('bg_menu', 'assets/decor.jpg');
     this.load.image('tiles','assets/tiles/tiles.png');
     this.load.image('box','assets/box.png');
@@ -206,6 +225,8 @@ create(){
     let playButton = this.add.image (400, 225, 'jouer').setOrigin(0.25,1.25).setScale(0.15);
     let quitter = this.add.image (400, 225, 'quitter').setOrigin(0.25,-0.5).setScale(0.15);
     let hoverSprite = this.add.sprite(0,0,"sprite_buta_normal").setScale(0.05).setVisible(false).setOrigin(-3,-1.7);
+    let buttonChoixMobile = this.add.image(100, 400, 'mobile_off').setScrollFactor(0).setScale(0.1);
+
 
 // PointerEvents:
 //   pointerover - hovering
@@ -215,6 +236,7 @@ create(){
 
     playButton.setInteractive();
     quitter.setInteractive();
+    buttonChoixMobile.setInteractive();
 
     playButton.on("pointerover", ()=>{  
         hoverSprite.setVisible(true);
@@ -248,5 +270,16 @@ create(){
     quitter.on("pointerdown", ()=>{
         game.destroy(true, false);
     })
+
+    buttonChoixMobile.on('pointerdown', function(){
+        if (commandeMobile == false){
+            commandeMobile = true;
+            this.add.image(100, 400, 'mobile_on').setScrollFactor(0).setScale(0.1);
+        }
+        else {
+            commandeMobile = false;
+            this.add.image(100, 400, 'mobile_off').setScrollFactor(0).setScale(0.1);
+        }
+    }, this)
 }
 }

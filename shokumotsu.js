@@ -69,7 +69,7 @@ create ()
     
     player.setBounce(0.0);
     player.setCollideWorldBounds(false);
-    
+
     cursors = this.input.keyboard.createCursorKeys(); 
     Jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);  
     Competence_Speciale = this.input.keyboard.addKey('F');
@@ -80,8 +80,8 @@ create ()
     cursors.down.reset();
     Roulade.reset();
     Competence_Speciale.reset()
-    Jump.reset();
-
+    Jump.reset(); 
+    
     this.physics.add.collider(player, ground);
     this.physics.add.collider(player, this.death_zone, death_Zone_Spawnpoint, null, this);
     this.physics.add.collider(player, this.death_zone_2, death_Zone_Spawnpoint_2, null, this);
@@ -883,6 +883,35 @@ update ()
     onGround = player.body.blocked.down;
     roulade=false;
     player.setGravityY(300);
+
+    if(commandeMobile==true){
+        let Droite2 = this.add.sprite(90, 418, 'Touche_droite').setScrollFactor(0).setScale(0.1);
+        let Gauche2 = this.add.sprite(30, 418, 'Touche_gauche').setScrollFactor(0).setScale(0.1);
+        let Haut2 = this.add.sprite(775, 350, 'Touche_haut').setScrollFactor(0).setScale(0.1);
+        let Bas2 = this.add.sprite(775, 418, 'Touche_bas').setScrollFactor(0).setScale(0.1);
+        let Competence_Speciale2 = this.add.sprite(700, 418, 'Competence_Speciale').setScrollFactor(0).setScale(0.10);
+        let Roulade2 = this.add.sprite(850, 418, 'Roulade').setScrollFactor(0).setScale(0.10);
+
+        Droite2.on("pointerdown", ()=>{
+            cursors.right.isDown
+        })
+        Gauche2.on("pointerdown", ()=>{
+            cursors.left.isDown
+        })
+        Haut2.on("pointerdown", ()=>{
+            cursors.up.isDown
+        })
+        Bas2.on("pointerdown", ()=>{
+            cursors.down.isDown
+        })
+        Competence_Speciale2.on("pointerdown", ()=>{
+            Competence_Speciale.isDown
+        })
+        Roulade2.on("pointerdown", ()=>{
+            Roulade.isDown
+        })
+    }
+
     if(cursors.right.isDown){
         playerDirection='RIGHT'
         }
@@ -1527,6 +1556,7 @@ update ()
         {
             jauge2.anims.play('jauge_100',true); 
         }
+      
 }
 }
 }
@@ -2173,8 +2203,4 @@ function death_Zone_Spawnpoint_3(){
     }
     player.x=1250;
     player.y=500;  
-}
-
-function change_screen(){
-    
 }
